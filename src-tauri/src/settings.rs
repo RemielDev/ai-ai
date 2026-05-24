@@ -1,11 +1,13 @@
-//! Persistent settings via tauri-plugin-store. Holds non-secret prefs only.
+//! Persistent settings via tauri-plugin-store.
 
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
 const STORE_FILE: &str = "settings.json";
+pub const TRIAL_DAYS: i64 = 7;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
@@ -17,6 +19,8 @@ pub struct Settings {
     pub auto_send_after_paste: bool,
     pub telemetry_opt_in: bool,
     pub first_run: bool,
+    #[serde(default = "Utc::now")]
+    pub first_launch_at: DateTime<Utc>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, PartialEq, Eq)]
@@ -50,6 +54,7 @@ impl Default for Settings {
             auto_send_after_paste: false,
             telemetry_opt_in: false,
             first_run: true,
+            first_launch_at: Utc::now(),
         }
     }
 }
@@ -89,4 +94,30 @@ pub fn mark_first_run_complete(app: &AppHandle) {
     }
     s.first_run = false;
     let _ = save(app, &s);
+}
+
+pub fn reset(app: &AppHandle) -> Result<()> {
+    let store = app.store(STORE_FILE)?;
+    let mut fresh = Settings::default();
+    fresh.first_run = true;
+    store.set("settings", serde_json::to_value(&fresh)?);
+    store.save()?;
+    Ok(())
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct TrialStatus {
+    pub in_trial: bool,
+    pub days_left: i64,
+}
+
+pub fn trial_status(app: &AppHandle) -> TrialStatus {
+    let s = current(app);
+    let now = Utc::now();
+    let elapsed = (now - s.first_launch_at).num_days();
+    let left = (TRIAL_DAYS - elapsed).max(0);
+    TrialStatus {
+        in_trial: left > 0,
+        days_left: left,
+    }
 }

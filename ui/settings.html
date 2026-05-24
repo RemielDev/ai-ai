@@ -4,97 +4,252 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI-AI Settings</title>
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="settings-body">
-  <div class="settings-shell">
-    <header class="settings-header">
+<body class="app-body">
+  <div class="shell">
+    <header class="shell-header">
       <div class="brand">
-        <span class="brand-dot"></span>
+        <span class="brand-mark" aria-hidden="true">AI</span>
         <span class="brand-name">AI-AI</span>
       </div>
-      <span class="settings-version" id="version">v0.1.0</span>
+      <span class="app-version" id="app-version">v0.1.0</span>
     </header>
 
-    <main class="settings-main">
-      <section class="card">
-        <h2>Anthropic API key</h2>
-        <p class="muted">Stored in Windows Credential Manager. Never written to disk in plain text.</p>
-        <div class="row">
-          <input id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" />
-          <button class="primary" id="save-key">Save</button>
-          <button class="ghost" id="clear-key">Clear</button>
-        </div>
-        <div class="status" id="key-status">Checking…</div>
-      </section>
-
-      <section class="card">
-        <h2>Model</h2>
-        <p class="muted">Haiku is fastest and cheapest. Sonnet gives noticeably better suggestions.</p>
-        <select id="model-select">
-          <option value="claude-haiku-4-6">Claude Haiku 4.6 (fast, ~$0.001/call)</option>
-          <option value="claude-sonnet-4-7">Claude Sonnet 4.7 (quality, ~$0.01/call)</option>
-        </select>
-      </section>
-
-      <section class="card">
-        <h2>Hotkeys</h2>
-        <p class="muted">Use modifier names (Ctrl, Shift, Alt) joined with <code>+</code>.</p>
-        <div class="grid-2">
-          <label>Summon suggestions
-            <input id="summon-hotkey" type="text" value="Ctrl+Shift+Space" />
-          </label>
-          <label>Paste / improve
-            <input id="action-hotkey" type="text" value="Ctrl+Shift+Enter" />
-          </label>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Suggestions</h2>
-        <div class="grid-2">
-          <label>How many per round
-            <input id="count" type="number" min="3" max="6" value="4" />
-          </label>
-          <label>Style
-            <select id="style">
-              <option value="default">Default — balanced</option>
-              <option value="concise">Concise — short and punchy</option>
-              <option value="exploratory">Exploratory — lateral angles</option>
-              <option value="technical">Technical — depth and trade-offs</option>
-            </select>
-          </label>
-        </div>
-        <label class="row-toggle">
-          <input id="auto-send" type="checkbox" />
-          Auto-send the prompt after pasting (skip manual Enter)
-        </label>
-      </section>
-
-      <section class="card">
-        <h2>Privacy</h2>
-        <label class="row-toggle">
-          <input id="telemetry" type="checkbox" />
-          Send anonymous usage counts (no prompt content ever)
-        </label>
-        <p class="muted">Suggestions and prompts go directly to Anthropic with your key. AI-AI never proxies them.</p>
-      </section>
-
-      <section class="card">
-        <h2>License</h2>
-        <div id="license-status" class="status">Loading…</div>
-        <div class="row">
-          <input id="license-key" type="text" placeholder="Paste license key…" />
-          <button class="primary" id="activate-license">Activate</button>
-        </div>
-      </section>
-
-      <div class="actions-row">
-        <button class="primary big" id="save-all">Save settings</button>
-        <span id="saved-flash" class="saved-flash hidden">Saved</span>
+    <div class="banner is-info hidden" id="trial-banner">
+      <span data-icon="spark"></span>
+      <div class="banner-body">
+        <strong>Trial active</strong> — <span id="trial-days-left">7</span> days remaining.
+        After trial, AI-AI keeps working but updates require a license.
       </div>
-    </main>
+      <button class="banner-action" id="trial-buy">Get license</button>
+    </div>
+
+    <div class="banner is-danger hidden" id="key-missing-banner">
+      <span data-icon="alert"></span>
+      <div class="banner-body">
+        <strong>No API key set.</strong> Paste your Anthropic key below to enable suggestions.
+      </div>
+    </div>
+
+    <div role="tablist" aria-label="Settings sections" class="tabs">
+      <button role="tab" id="tab-setup"    aria-controls="panel-setup"    aria-selected="true"  class="tab">
+        <span data-icon="key"></span> Setup
+      </button>
+      <button role="tab" id="tab-behavior" aria-controls="panel-behavior" aria-selected="false" class="tab">
+        <span data-icon="sliders"></span> Behavior
+      </button>
+      <button role="tab" id="tab-privacy"  aria-controls="panel-privacy"  aria-selected="false" class="tab">
+        <span data-icon="shield"></span> Privacy
+      </button>
+      <button role="tab" id="tab-about"    aria-controls="panel-about"    aria-selected="false" class="tab">
+        <span data-icon="info"></span> About
+      </button>
+    </div>
+
+    <!-- ===================== SETUP ===================== -->
+    <section role="tabpanel" id="panel-setup" aria-labelledby="tab-setup" class="tab-panel is-visible">
+      <div class="card">
+        <div class="card-header">
+          <h2>Anthropic API key</h2>
+          <div class="status-line is-loading" id="key-status">
+            <span data-icon="loader"></span> Checking…
+          </div>
+        </div>
+        <p class="card-desc">
+          Stored in Windows Credential Manager. Never written to disk in plain text.
+          Get one at <a href="#" data-external="https://console.anthropic.com/settings/keys">console.anthropic.com</a>.
+        </p>
+        <div class="field">
+          <div class="row">
+            <input id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+            <button class="btn btn-primary" id="save-key" type="button">
+              <span data-icon="check"></span> Save & verify
+            </button>
+            <button class="btn btn-ghost" id="clear-key" type="button">Clear</button>
+          </div>
+          <div class="field-hint" id="key-hint">Keys start with <code>sk-ant-</code>.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Model</h2>
+          <span class="status-line" id="model-cost"></span>
+        </div>
+        <p class="card-desc">Haiku is fastest and cheapest. Sonnet gives noticeably better suggestions.</p>
+        <div class="field">
+          <select id="model-select">
+            <option value="claude-haiku-4-6">Claude Haiku 4.6 — fast, low cost</option>
+            <option value="claude-sonnet-4-7">Claude Sonnet 4.7 — best quality</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Hotkeys</h2></div>
+        <p class="card-desc">Click a field and press your key combination. Use modifiers (Ctrl, Shift, Alt) plus one key.</p>
+        <div class="grid-2">
+          <div class="field">
+            <span class="field-label">Summon suggestions</span>
+            <div class="hotkey-recorder" data-target="summon-hotkey" tabindex="0" role="button" aria-label="Summon hotkey recorder">
+              <div class="hotkey-keys" id="summon-keys"></div>
+              <button class="hotkey-record-action" type="button">Record</button>
+            </div>
+            <input type="hidden" id="summon-hotkey" value="Ctrl+Shift+Space" />
+            <div class="field-hint">Opens the suggestion overlay above Claude's chat input.</div>
+          </div>
+          <div class="field">
+            <span class="field-label">Paste / improve</span>
+            <div class="hotkey-recorder" data-target="action-hotkey" tabindex="0" role="button" aria-label="Action hotkey recorder">
+              <div class="hotkey-keys" id="action-keys"></div>
+              <button class="hotkey-record-action" type="button">Record</button>
+            </div>
+            <input type="hidden" id="action-hotkey" value="Ctrl+Shift+Enter" />
+            <div class="field-hint">Context-aware: pastes from overlay or improves your draft in Claude.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== BEHAVIOR ===================== -->
+    <section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Suggestions per round</h2>
+          <span class="status-line" id="count-display">4 suggestions</span>
+        </div>
+        <input id="count" type="range" min="3" max="6" value="4" aria-label="Number of suggestions per round" />
+        <div class="field-hint">Fewer = faster + lower cost. More = more variety per call.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Suggestion style</h2></div>
+        <p class="card-desc">A small system-prompt addendum that shifts the tone of suggestions.</p>
+        <div class="field">
+          <select id="style">
+            <option value="default">Default — balanced angles</option>
+            <option value="concise">Concise — short and punchy</option>
+            <option value="exploratory">Exploratory — lateral, open-ended</option>
+            <option value="technical">Technical — depth, trade-offs</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Paste behavior</h2></div>
+        <label class="switch">
+          <input id="auto-send" type="checkbox" />
+          <span class="switch-thumb" aria-hidden="true"></span>
+          <span class="switch-label">
+            Auto-send after pasting
+            <span class="switch-hint">Skip the manual Enter. Off by default for safety.</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>System</h2></div>
+        <label class="switch">
+          <input id="autostart" type="checkbox" />
+          <span class="switch-thumb" aria-hidden="true"></span>
+          <span class="switch-label">
+            Start AI-AI when Windows boots
+            <span class="switch-hint">Adds AI-AI to startup. No window opens — just the tray icon.</span>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ===================== PRIVACY ===================== -->
+    <section role="tabpanel" id="panel-privacy" aria-labelledby="tab-privacy" class="tab-panel">
+      <div class="card">
+        <div class="card-header"><h2>Telemetry</h2></div>
+        <p class="card-desc">
+          AI-AI never proxies your prompts or sees their content. Suggestions go directly from your machine to Anthropic with your key.
+        </p>
+        <label class="switch">
+          <input id="telemetry" type="checkbox" />
+          <span class="switch-thumb" aria-hidden="true"></span>
+          <span class="switch-label">
+            Share anonymous usage counts
+            <span class="switch-hint">Only counts (launches, accepts, errors). No prompt content.</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>License</h2></div>
+        <div id="license-status" class="status-line is-loading">
+          <span data-icon="loader"></span> Loading…
+        </div>
+        <div class="field" style="margin-top: 16px;">
+          <span class="field-label">Activate license</span>
+          <div class="row">
+            <input id="license-key" type="text" placeholder="Paste license key…" autocomplete="off" />
+            <button class="btn btn-primary" id="activate-license" type="button">Activate</button>
+          </div>
+          <div class="field-hint">Buy at <a href="#" data-external="https://gumroad.com">gumroad.com</a> — coming soon.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Reset</h2></div>
+        <p class="card-desc">Clears all settings and removes your API key from Windows Credential Manager. App stays installed.</p>
+        <button class="btn btn-danger" id="reset-all" type="button">Reset everything</button>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section role="tabpanel" id="panel-about" aria-labelledby="tab-about" class="tab-panel">
+      <div class="card">
+        <div class="card-header"><h2>About AI-AI</h2></div>
+        <p class="card-desc">
+          A prompt copilot for Claude Desktop. Reads your most recent Claude response and proposes follow-up prompts.
+          Improves drafts in place with a single keystroke.
+        </p>
+        <ul class="about-list">
+          <li><span>Version</span><span id="about-version">0.1.0</span></li>
+          <li><span>Platform</span><span>Windows 10/11</span></li>
+          <li><span>Engine</span><span>Tauri 2 + Rust</span></li>
+          <li><span>Suggestions today</span><span id="about-count">0</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Updates</h2></div>
+        <p class="card-desc">AI-AI checks for new versions on launch.</p>
+        <div class="row">
+          <button class="btn btn-secondary" id="check-updates" type="button">
+            <span data-icon="refresh"></span> Check now
+          </button>
+          <span class="status-line" id="update-status"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Acknowledgements</h2></div>
+        <p class="card-desc">
+          AI-AI is independent and not affiliated with Anthropic. "Claude" is a trademark of Anthropic.
+          Built with Tauri, Rust, and the Anthropic API.
+        </p>
+      </div>
+    </section>
+
+    <div class="actions-row">
+      <button class="btn btn-primary btn-lg" id="save-all" type="button">
+        <span data-icon="check"></span> Save settings
+      </button>
+      <button class="btn btn-ghost" id="revert" type="button">Revert</button>
+      <span id="saved-flash" class="saved-flash hidden">
+        <span data-icon="check"></span> Saved
+      </span>
+    </div>
   </div>
+
+  <div id="toast-root"></div>
+  <script src="icons.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>

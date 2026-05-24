@@ -4,44 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI-AI</title>
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="overlay-body">
-  <div class="overlay-shell" id="shell">
+  <div class="overlay-shell" id="shell" role="dialog" aria-label="AI-AI suggestions">
     <header class="overlay-header">
       <div class="brand">
-        <span class="brand-dot"></span>
+        <span class="brand-mark" aria-hidden="true">AI</span>
         <span class="brand-name">AI-AI</span>
-        <span class="brand-sub" id="brand-sub">thinking…</span>
+        <span class="brand-sub" id="brand-sub" aria-live="polite">thinking</span>
       </div>
       <div class="header-actions">
-        <button class="hbtn" id="regenerate-btn" title="Regenerate (variation)">↻</button>
-        <button class="hbtn" id="close-btn" title="Dismiss (Esc)">×</button>
+        <button class="icon-btn" id="regenerate-btn" type="button"
+                title="Regenerate (different angle)" aria-label="Regenerate suggestions"
+                data-icon="refresh"></button>
+        <button class="icon-btn" id="close-btn" type="button"
+                title="Dismiss (Esc)" aria-label="Close overlay"
+                data-icon="close"></button>
       </div>
     </header>
 
+    <div id="steer-banner" class="steer-banner hidden" role="status">
+      <span data-icon="info"></span>
+      <div>
+        <span class="steer-label">Steering:</span>
+        <span class="steer-text" id="steer-text"></span>
+      </div>
+    </div>
+
     <main class="overlay-main" id="main">
-      <div class="state state-loading" id="state-loading">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton short"></div>
+      <div class="state state-loading" id="state-loading" aria-live="polite" aria-busy="true">
+        <div class="skeleton-list">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
       </div>
 
-      <div class="state state-error hidden" id="state-error">
-        <div class="error-title">Couldn't generate suggestions</div>
-        <div class="error-body" id="error-body"></div>
-        <button class="retry-btn" id="retry-btn">Retry</button>
+      <div class="state state-error hidden" id="state-error" role="alert">
+        <div class="state-error-icon" data-icon="alert"></div>
+        <div class="state-error-title" id="error-title">Couldn't generate suggestions</div>
+        <div class="state-error-body" id="error-body"></div>
+        <div class="state-error-actions">
+          <button class="btn btn-secondary" id="retry-btn" type="button">
+            <span data-icon="refresh"></span> Retry
+          </button>
+          <button class="btn btn-ghost" id="error-close-btn" type="button">Dismiss</button>
+        </div>
       </div>
 
-      <ol class="suggestions hidden" id="suggestions"></ol>
+      <div class="state state-empty hidden" id="state-empty">
+        <span data-icon="search"></span>
+        <div class="state-error-title">No Claude response yet</div>
+        <div class="state-error-body">
+          Wait for Claude to finish responding, then summon again.
+        </div>
+      </div>
+
+      <ol class="suggestions hidden" id="suggestions" role="listbox" aria-label="Suggested prompts"></ol>
     </main>
 
     <footer class="overlay-footer">
-      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> nav · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> paste · <kbd>Esc</kbd> close</span>
+      <div class="footer-hint">
+        <span><kbd>↑</kbd><kbd>↓</kbd> nav</span>
+        <span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> paste</span>
+        <span><kbd>1</kbd>–<kbd>6</kbd> quick</span>
+        <span><kbd>Esc</kbd> close</span>
+      </div>
     </footer>
   </div>
 
+  <script src="icons.js"></script>
   <script src="overlay.js"></script>
 </body>
 </html>

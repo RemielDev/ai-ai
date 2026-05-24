@@ -151,6 +151,34 @@ No prose, no markdown fence.{steer_block}{variation_block}{style_block}"
         Ok(suggestions)
     }
 
+    /// Lightweight ping to validate the API key. 1 token, ~$0.
+    pub async fn validate(&self) -> Result<()> {
+        let body = json!({
+            "model": self.model,
+            "max_tokens": 1,
+            "messages": [{"role": "user", "content": "hi"}],
+        });
+        let resp = self
+            .client
+            .post(ANTHROPIC_URL)
+            .header("x-api-key", &self.api_key)
+            .header("anthropic-version", ANTHROPIC_VERSION)
+            .header("content-type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .context("send validation request")?;
+        let status = resp.status();
+        if status == reqwest::StatusCode::UNAUTHORIZED {
+            anyhow::bail!("Anthropic rejected the key (401)");
+        }
+        if !status.is_success() {
+            let raw = resp.text().await.unwrap_or_default();
+            anyhow::bail!("Anthropic returned {}: {}", status, truncate(&raw, 200));
+        }
+        Ok(())
+    }
+
     pub async fn improve_prompt(&self, draft: &str) -> Result<String> {
         let system_prompt = "Rewrite the following draft prompt to be clearer, more specific, \
 and more likely to get a useful response from an AI assistant. Preserve the user's intent and tone. \

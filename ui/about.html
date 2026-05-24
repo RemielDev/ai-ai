@@ -3,18 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <title>About AI-AI</title>
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="settings-body">
-  <div class="settings-shell" style="padding: 32px;">
-    <div class="brand" style="margin-bottom: 16px;">
-      <span class="brand-dot"></span>
-      <span class="brand-name" style="font-size: 22px;">AI-AI</span>
+<body class="app-body">
+  <div class="shell" style="max-width: 460px;">
+    <div class="card">
+      <div class="brand" style="margin-bottom: 16px;">
+        <span class="brand-mark" aria-hidden="true">AI</span>
+        <span class="brand-name" style="font-size: 18px;">AI-AI</span>
+      </div>
+      <p class="card-desc">Prompt copilot for Claude Desktop. Bring your own Anthropic key — prompts never touch our servers.</p>
+      <ul class="about-list">
+        <li><span>Version</span><span>0.1.0</span></li>
+        <li><span>Engine</span><span>Tauri 2 + Rust</span></li>
+        <li><span>Platform</span><span>Windows 10/11</span></li>
+      </ul>
+      <p class="card-desc" style="margin-top: 20px;">
+        Independent — not affiliated with Anthropic. "Claude" is a trademark of Anthropic.
+      </p>
     </div>
-    <p>Prompt copilot for Claude Desktop.</p>
-    <p class="muted">v0.1.0 — Windows preview build</p>
-    <p class="muted">Bring your own Anthropic API key. Suggestions are generated locally, sent only to Anthropic. AI-AI never proxies your prompts.</p>
-    <p class="muted">© 2026 Remie · <a href="https://github.com" target="_blank">github.com</a></p>
   </div>
+  <script src="icons.js"></script>
 </body>
 </html>
