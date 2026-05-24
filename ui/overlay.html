@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="overlay-body">
+  <div class="overlay-shell" id="shell">
+    <header class="overlay-header">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">AI-AI</span>
+        <span class="brand-sub" id="brand-sub">thinking…</span>
+      </div>
+      <div class="header-actions">
+        <button class="hbtn" id="regenerate-btn" title="Regenerate (variation)">↻</button>
+        <button class="hbtn" id="close-btn" title="Dismiss (Esc)">×</button>
+      </div>
+    </header>
+
+    <main class="overlay-main" id="main">
+      <div class="state state-loading" id="state-loading">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton short"></div>
+      </div>
+
+      <div class="state state-error hidden" id="state-error">
+        <div class="error-title">Couldn't generate suggestions</div>
+        <div class="error-body" id="error-body"></div>
+        <button class="retry-btn" id="retry-btn">Retry</button>
+      </div>
+
+      <ol class="suggestions hidden" id="suggestions"></ol>
+    </main>
+
+    <footer class="overlay-footer">
+      <span class="hint"><kbd>↑</kbd><kbd>↓</kbd> nav · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> paste · <kbd>Esc</kbd> close</span>
+    </footer>
+  </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>

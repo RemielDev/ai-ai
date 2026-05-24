@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-AI Settings</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="settings-body">
+  <div class="settings-shell">
+    <header class="settings-header">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span class="brand-name">AI-AI</span>
+      </div>
+      <span class="settings-version" id="version">v0.1.0</span>
+    </header>
+
+    <main class="settings-main">
+      <section class="card">
+        <h2>Anthropic API key</h2>
+        <p class="muted">Stored in Windows Credential Manager. Never written to disk in plain text.</p>
+        <div class="row">
+          <input id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" />
+          <button class="primary" id="save-key">Save</button>
+          <button class="ghost" id="clear-key">Clear</button>
+        </div>
+        <div class="status" id="key-status">Checking…</div>
+      </section>
+
+      <section class="card">
+        <h2>Model</h2>
+        <p class="muted">Haiku is fastest and cheapest. Sonnet gives noticeably better suggestions.</p>
+        <select id="model-select">
+          <option value="claude-haiku-4-6">Claude Haiku 4.6 (fast, ~$0.001/call)</option>
+          <option value="claude-sonnet-4-7">Claude Sonnet 4.7 (quality, ~$0.01/call)</option>
+        </select>
+      </section>
+
+      <section class="card">
+        <h2>Hotkeys</h2>
+        <p class="muted">Use modifier names (Ctrl, Shift, Alt) joined with <code>+</code>.</p>
+        <div class="grid-2">
+          <label>Summon suggestions
+            <input id="summon-hotkey" type="text" value="Ctrl+Shift+Space" />
+          </label>
+          <label>Paste / improve
+            <input id="action-hotkey" type="text" value="Ctrl+Shift+Enter" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Suggestions</h2>
+        <div class="grid-2">
+          <label>How many per round
+            <input id="count" type="number" min="3" max="6" value="4" />
+          </label>
+          <label>Style
+            <select id="style">
+              <option value="default">Default — balanced</option>
+              <option value="concise">Concise — short and punchy</option>
+              <option value="exploratory">Exploratory — lateral angles</option>
+              <option value="technical">Technical — depth and trade-offs</option>
+            </select>
+          </label>
+        </div>
+        <label class="row-toggle">
+          <input id="auto-send" type="checkbox" />
+          Auto-send the prompt after pasting (skip manual Enter)
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Privacy</h2>
+        <label class="row-toggle">
+          <input id="telemetry" type="checkbox" />
+          Send anonymous usage counts (no prompt content ever)
+        </label>
+        <p class="muted">Suggestions and prompts go directly to Anthropic with your key. AI-AI never proxies them.</p>
+      </section>
+
+      <section class="card">
+        <h2>License</h2>
+        <div id="license-status" class="status">Loading…</div>
+        <div class="row">
+          <input id="license-key" type="text" placeholder="Paste license key…" />
+          <button class="primary" id="activate-license">Activate</button>
+        </div>
+      </section>
+
+      <div class="actions-row">
+        <button class="primary big" id="save-all">Save settings</button>
+        <span id="saved-flash" class="saved-flash hidden">Saved</span>
+      </div>
+    </main>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>
