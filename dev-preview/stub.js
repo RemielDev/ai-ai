@@ -12,7 +12,8 @@ window.__TAURI__ = {
           return { valid: true, tier: "dev-bypass", message: "License gate disabled in this build." };
         case "load_settings":
           return {
-            model: "claude-haiku-4-6",
+            provider: "gemini",
+            model: "gemini-2.0-flash",
             summon_hotkey: "Ctrl+Shift+Space",
             action_hotkey: "Ctrl+Shift+Enter",
             suggestion_count: 4,
@@ -20,6 +21,7 @@ window.__TAURI__ = {
             auto_send_after_paste: false,
             telemetry_opt_in: false,
             first_run: false,
+            first_launch_at: new Date().toISOString(),
           };
         case "get_autostart":   return false;
         case "trial_status":    return { in_trial: true, days_left: 5 };

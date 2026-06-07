@@ -101,11 +101,11 @@ async fn on_summon(app: AppHandle, settings: Settings) -> Result<()> {
         return Ok(());
     }
 
-    let Some(api_key) = secrets::get_api_key().ok().flatten() else {
+    let Some(api_key) = secrets::get_api_key(settings.provider).ok().flatten() else {
         notify(
             &app,
             "AI-AI — set up your API key",
-            "Open Settings from the tray to paste your Anthropic API key.",
+            &format!("Open Settings to paste your {} API key.", settings.provider.label()),
         );
         let _ = crate::open_settings(&app);
         return Ok(());
@@ -147,18 +147,19 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
         return Ok(());
     }
 
-    let Some(api_key) = secrets::get_api_key().ok().flatten() else {
+    let Some(api_key) = secrets::get_api_key(settings.provider).ok().flatten() else {
         notify(
             &app,
             "AI-AI — set up your API key",
-            "Open Settings from the tray to paste your Anthropic API key.",
+            &format!("Open Settings to paste your {} API key.", settings.provider.label()),
         );
         return Ok(());
     };
 
     let draft_owned = draft.to_string();
+    let provider = settings.provider;
     tauri::async_runtime::spawn(async move {
-        let suggester = current_suggester(api_key, &settings);
+        let suggester = current_suggester(provider, api_key, &settings);
         match suggester.improve_prompt(&draft_owned).await {
             Ok(improved) => {
                 if let Err(e) =
@@ -232,7 +233,7 @@ fn spawn_generation(
             .variation
             .next(&snapshot.last_assistant_msg, &snapshot.chat_input_text);
 
-        let suggester = current_suggester(api_key, &settings);
+        let suggester = current_suggester(settings.provider, api_key, &settings);
         match suggester
             .generate_followups(
                 &snapshot,
@@ -274,8 +275,8 @@ pub fn regenerate(app: AppHandle) -> Result<()> {
         .lock()
         .clone()
         .ok_or_else(|| anyhow::anyhow!("no snapshot in state"))?;
-    let api_key = secrets::get_api_key()?
-        .ok_or_else(|| anyhow::anyhow!("no API key configured"))?;
+    let api_key = secrets::get_api_key(settings.provider)?
+        .ok_or_else(|| anyhow::anyhow!("no API key configured for {}", settings.provider.label()))?;
     spawn_generation(app, snapshot, settings, api_key);
     Ok(())
 }

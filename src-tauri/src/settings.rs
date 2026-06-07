@@ -11,6 +11,8 @@ pub const TRIAL_DAYS: i64 = 7;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
+    #[serde(default = "default_provider")]
+    pub provider: Provider,
     pub model: String,
     pub summon_hotkey: String,
     pub action_hotkey: String,
@@ -21,6 +23,55 @@ pub struct Settings {
     pub first_run: bool,
     #[serde(default = "Utc::now")]
     pub first_launch_at: DateTime<Utc>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum Provider {
+    Anthropic,
+    OpenAI,
+    OpenRouter,
+    Gemini,
+}
+
+fn default_provider() -> Provider {
+    Provider::Gemini
+}
+
+impl Provider {
+    pub fn label(self) -> &'static str {
+        match self {
+            Provider::Anthropic => "Anthropic",
+            Provider::OpenAI => "OpenAI",
+            Provider::OpenRouter => "OpenRouter",
+            Provider::Gemini => "Google Gemini",
+        }
+    }
+    pub fn slug(self) -> &'static str {
+        match self {
+            Provider::Anthropic => "anthropic",
+            Provider::OpenAI => "openai",
+            Provider::OpenRouter => "openrouter",
+            Provider::Gemini => "gemini",
+        }
+    }
+    pub fn key_prefix_hint(self) -> &'static str {
+        match self {
+            Provider::Anthropic => "sk-ant-",
+            Provider::OpenAI => "sk-",
+            Provider::OpenRouter => "sk-or-",
+            Provider::Gemini => "AIza",
+        }
+    }
+    #[allow(dead_code)]
+    pub fn console_url(self) -> &'static str {
+        match self {
+            Provider::Anthropic => "https://console.anthropic.com/settings/keys",
+            Provider::OpenAI => "https://platform.openai.com/api-keys",
+            Provider::OpenRouter => "https://openrouter.ai/keys",
+            Provider::Gemini => "https://aistudio.google.com/apikey",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, PartialEq, Eq)]
@@ -46,7 +97,8 @@ impl StylePreset {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            model: "claude-haiku-4-6".into(),
+            provider: Provider::Gemini,
+            model: "gemini-2.0-flash".into(),
             summon_hotkey: "Ctrl+Shift+Space".into(),
             action_hotkey: "Ctrl+Shift+Enter".into(),
             suggestion_count: 4,
@@ -98,8 +150,7 @@ pub fn mark_first_run_complete(app: &AppHandle) {
 
 pub fn reset(app: &AppHandle) -> Result<()> {
     let store = app.store(STORE_FILE)?;
-    let mut fresh = Settings::default();
-    fresh.first_run = true;
+    let fresh = Settings::default();
     store.set("settings", serde_json::to_value(&fresh)?);
     store.save()?;
     Ok(())

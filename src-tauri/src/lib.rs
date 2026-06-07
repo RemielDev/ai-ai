@@ -61,6 +61,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::save_api_key,
             commands::get_api_key_status,
+            commands::get_all_key_status,
             commands::clear_api_key,
             commands::validate_api_key,
             commands::load_settings,

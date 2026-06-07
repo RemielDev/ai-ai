@@ -1,56 +1,56 @@
-// Settings frontend.
-// Tabs, hotkey capture widget, live validation, toast notifications.
+// Settings frontend — multi-provider, tabbed, with hotkey capture and live validation.
 
 const { invoke } = window.__TAURI__.core;
-const { listen } = window.__TAURI__.event;
 const opener = window.__TAURI__.opener;
 
 const els = {
-  // Setup
-  apiKey:       document.getElementById("api-key-input"),
-  saveKey:      document.getElementById("save-key"),
-  clearKey:     document.getElementById("clear-key"),
-  keyStatus:    document.getElementById("key-status"),
-  keyHint:      document.getElementById("key-hint"),
+  // Setup — provider
+  provider:      document.getElementById("provider-select"),
+  providerCost:  document.getElementById("provider-cost"),
+  model:         document.getElementById("model-input"),
+  modelHint:     document.getElementById("model-hint"),
+  // Setup — key
+  keyCardTitle:  document.getElementById("key-card-title"),
+  keyDesc:       document.getElementById("key-desc"),
+  keyConsoleLink: document.getElementById("key-console-link"),
+  keyPrefixHint: document.getElementById("key-prefix-hint"),
+  apiKey:        document.getElementById("api-key-input"),
+  saveKey:       document.getElementById("save-key"),
+  clearKey:      document.getElementById("clear-key"),
+  keyStatus:     document.getElementById("key-status"),
   keyMissingBanner: document.getElementById("key-missing-banner"),
-  model:        document.getElementById("model-select"),
-  modelCost:    document.getElementById("model-cost"),
-  summon:       document.getElementById("summon-hotkey"),
-  action:       document.getElementById("action-hotkey"),
-  summonKeys:   document.getElementById("summon-keys"),
-  actionKeys:   document.getElementById("action-keys"),
+  // Setup — hotkeys
+  summon:        document.getElementById("summon-hotkey"),
+  action:        document.getElementById("action-hotkey"),
+  summonKeys:    document.getElementById("summon-keys"),
+  actionKeys:    document.getElementById("action-keys"),
   // Behavior
-  count:        document.getElementById("count"),
-  countDisplay: document.getElementById("count-display"),
-  style:        document.getElementById("style"),
-  autoSend:     document.getElementById("auto-send"),
-  autostart:    document.getElementById("autostart"),
+  count:         document.getElementById("count"),
+  countDisplay:  document.getElementById("count-display"),
+  style:         document.getElementById("style"),
+  autoSend:      document.getElementById("auto-send"),
+  autostart:     document.getElementById("autostart"),
   // Privacy
-  telemetry:    document.getElementById("telemetry"),
+  telemetry:     document.getElementById("telemetry"),
   licenseStatus: document.getElementById("license-status"),
-  licenseKey:   document.getElementById("license-key"),
+  licenseKey:    document.getElementById("license-key"),
   activateLicense: document.getElementById("activate-license"),
-  resetAll:     document.getElementById("reset-all"),
+  resetAll:      document.getElementById("reset-all"),
   // About
-  appVersion:   document.getElementById("app-version"),
-  aboutVersion: document.getElementById("about-version"),
-  aboutCount:   document.getElementById("about-count"),
-  checkUpdates: document.getElementById("check-updates"),
-  updateStatus: document.getElementById("update-status"),
+  appVersion:    document.getElementById("app-version"),
+  aboutVersion:  document.getElementById("about-version"),
+  aboutCount:    document.getElementById("about-count"),
+  checkUpdates:  document.getElementById("check-updates"),
+  updateStatus:  document.getElementById("update-status"),
   // Trial
-  trialBanner:  document.getElementById("trial-banner"),
-  trialDays:    document.getElementById("trial-days-left"),
-  trialBuy:     document.getElementById("trial-buy"),
+  trialBanner:   document.getElementById("trial-banner"),
+  trialDays:     document.getElementById("trial-days-left"),
+  trialBuy:      document.getElementById("trial-buy"),
   // Actions
-  saveAll:      document.getElementById("save-all"),
-  revert:       document.getElementById("revert"),
-  savedFlash:   document.getElementById("saved-flash"),
-  toastRoot:    document.getElementById("toast-root"),
-};
-
-const MODEL_COST = {
-  "claude-haiku-4-6":  "~$0.001 / call",
-  "claude-sonnet-4-7": "~$0.01 / call",
+  saveAll:       document.getElementById("save-all"),
+  revert:        document.getElementById("revert"),
+  savedFlash:    document.getElementById("saved-flash"),
+  toastRoot:     document.getElementById("toast-root"),
 };
 
 let originalSettings = null;
@@ -66,8 +66,6 @@ tabs.forEach((tab) => {
     const idx = order.indexOf(tab);
     if (e.key === "ArrowRight") order[(idx + 1) % order.length].focus();
     if (e.key === "ArrowLeft")  order[(idx - 1 + order.length) % order.length].focus();
-    if (e.key === "Home")       order[0].focus();
-    if (e.key === "End")        order[order.length - 1].focus();
   });
 });
 function activateTab(id) {
@@ -84,20 +82,38 @@ function toast(msg, kind = "info", ms = 2400) {
   el.className = "toast" + (kind === "success" ? " is-success" : kind === "error" ? " is-error" : "");
   el.textContent = msg;
   els.toastRoot.appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = "0";
-    setTimeout(() => el.remove(), 200);
-  }, ms);
+  setTimeout(() => { el.style.opacity = "0"; setTimeout(() => el.remove(), 200); }, ms);
 }
+
+// ============ Provider switching ============
+function applyProvider(slug, opts = {}) {
+  const p = window.PROVIDERS[slug];
+  if (!p) return;
+  els.providerCost.textContent = p.cost;
+  els.keyCardTitle.textContent = `${p.label} API key`;
+  els.keyConsoleLink.textContent = new URL(p.consoleUrl).host;
+  els.keyConsoleLink.dataset.external = p.consoleUrl;
+  els.keyPrefixHint.textContent = p.keyPrefix;
+  els.apiKey.placeholder = `${p.keyPrefix}...`;
+  els.modelHint.textContent = p.modelHint;
+  if (opts.resetModel) {
+    els.model.value = p.defaultModel;
+  }
+  refreshKeyStatus(slug);
+}
+
+els.provider.addEventListener("change", () => {
+  applyProvider(els.provider.value, { resetModel: true });
+});
 
 // ============ Hotkey capture ============
 function renderHotkey(value, container) {
   container.innerHTML = "";
   if (!value) {
-    const placeholder = document.createElement("span");
-    placeholder.style.color = "var(--text-muted)";
-    placeholder.textContent = "Not set";
-    container.appendChild(placeholder);
+    const p = document.createElement("span");
+    p.style.color = "var(--text-muted)";
+    p.textContent = "Not set";
+    container.appendChild(p);
     return;
   }
   value.split("+").forEach((part) => {
@@ -106,20 +122,17 @@ function renderHotkey(value, container) {
     container.appendChild(kbd);
   });
 }
-
 function startRecording(targetId, recorder) {
   recordingTarget = { targetId, recorder };
   recorder.classList.add("is-recording");
   recorder.querySelector(".hotkey-record-action").textContent = "Press keys…";
 }
-
 function stopRecording() {
   if (!recordingTarget) return;
   recordingTarget.recorder.classList.remove("is-recording");
   recordingTarget.recorder.querySelector(".hotkey-record-action").textContent = "Record";
   recordingTarget = null;
 }
-
 document.querySelectorAll(".hotkey-recorder").forEach((rec) => {
   rec.addEventListener("click", () => startRecording(rec.dataset.target, rec));
   rec.addEventListener("keydown", (e) => {
@@ -129,52 +142,33 @@ document.querySelectorAll(".hotkey-recorder").forEach((rec) => {
     }
   });
 });
-
 document.addEventListener("keydown", (e) => {
   if (!recordingTarget) return;
-  // Ignore lone modifier presses
   if (["Control", "Shift", "Alt", "Meta"].includes(e.key)) return;
-  e.preventDefault();
-  e.stopPropagation();
-
+  e.preventDefault(); e.stopPropagation();
   const parts = [];
   if (e.ctrlKey) parts.push("Ctrl");
   if (e.shiftKey) parts.push("Shift");
   if (e.altKey) parts.push("Alt");
-
   let key = e.key;
   if (key === " ") key = "Space";
-  else if (key === "Enter") key = "Enter";
-  else if (key === "Escape") {
-    stopRecording();
-    return;
-  } else if (key.length === 1) key = key.toUpperCase();
-
-  if (!parts.length) {
-    toast("Hotkey needs a modifier (Ctrl, Shift, or Alt).", "error");
-    return;
-  }
+  else if (key === "Escape") { stopRecording(); return; }
+  else if (key.length === 1) key = key.toUpperCase();
+  if (!parts.length) { toast("Hotkey needs a modifier (Ctrl/Shift/Alt).", "error"); return; }
   parts.push(key);
   const value = parts.join("+");
-
   document.getElementById(recordingTarget.targetId).value = value;
   const display = recordingTarget.targetId === "summon-hotkey" ? els.summonKeys : els.actionKeys;
   renderHotkey(value, display);
   stopRecording();
 }, true);
 
-// ============ External link interception ============
+// ============ External links ============
 document.addEventListener("click", async (e) => {
   const a = e.target.closest("[data-external]");
-  if (!a) return;
+  if (!a || !a.dataset.external) return;
   e.preventDefault();
-  try {
-    if (opener && opener.openUrl) {
-      await opener.openUrl(a.getAttribute("data-external"));
-    }
-  } catch (err) {
-    console.warn("opener failed", err);
-  }
+  try { if (opener && opener.openUrl) await opener.openUrl(a.dataset.external); } catch (_) {}
 });
 
 // ============ Status helpers ============
@@ -190,12 +184,11 @@ function setKeyStatus(state, msg) {
   els.keyMissingBanner.classList.toggle("hidden", state !== "danger");
 }
 
-async function refreshKeyStatus() {
+async function refreshKeyStatus(provider) {
   setKeyStatus("loading", "Checking…");
   try {
-    const present = await invoke("get_api_key_status");
-    if (present) setKeyStatus("ok", "API key saved");
-    else         setKeyStatus("danger", "No API key set");
+    const present = await invoke("get_api_key_status", { provider });
+    setKeyStatus(present ? "ok" : "danger", present ? "API key saved" : "No API key set");
   } catch (e) {
     setKeyStatus("danger", String(e));
   }
@@ -219,46 +212,38 @@ function updateCountDisplay() {
   els.countDisplay.textContent = `${els.count.value} suggestions`;
 }
 
-function updateModelCost() {
-  els.modelCost.textContent = MODEL_COST[els.model.value] || "";
-}
-
 // ============ Load / save ============
 async function loadAll() {
   const s = await invoke("load_settings");
   originalSettings = s;
+  els.provider.value = s.provider;
   els.model.value = s.model;
+  applyProvider(s.provider, { resetModel: false });
+
   els.summon.value = s.summon_hotkey;
   els.action.value = s.action_hotkey;
   els.count.value = s.suggestion_count;
   els.style.value = s.style_preset;
   els.autoSend.checked = s.auto_send_after_paste;
   els.telemetry.checked = s.telemetry_opt_in;
-
   renderHotkey(s.summon_hotkey, els.summonKeys);
   renderHotkey(s.action_hotkey, els.actionKeys);
   updateCountDisplay();
-  updateModelCost();
 
-  // Autostart status from backend
   try {
     const enabled = await invoke("get_autostart");
     els.autostart.checked = !!enabled;
-  } catch (_) { /* autostart plugin unavailable */ }
+  } catch (_) {}
 
-  // Stats
   try {
     const info = await invoke("get_app_info");
-    if (info && info.version) {
+    if (info) {
       els.appVersion.textContent   = "v" + info.version;
       els.aboutVersion.textContent = info.version;
-    }
-    if (info && typeof info.suggestions_today === "number") {
-      els.aboutCount.textContent = info.suggestions_today;
+      els.aboutCount.textContent   = info.suggestions_today;
     }
   } catch (_) {}
 
-  // Trial
   try {
     const trial = await invoke("trial_status");
     if (trial && trial.in_trial) {
@@ -272,7 +257,8 @@ async function loadAll() {
 
 function readSettings() {
   return {
-    model: els.model.value,
+    provider: els.provider.value,
+    model: els.model.value.trim() || window.PROVIDERS[els.provider.value].defaultModel,
     summon_hotkey: els.summon.value.trim(),
     action_hotkey: els.action.value.trim(),
     suggestion_count: parseInt(els.count.value, 10) || 4,
@@ -280,6 +266,7 @@ function readSettings() {
     auto_send_after_paste: els.autoSend.checked,
     telemetry_opt_in: els.telemetry.checked,
     first_run: false,
+    first_launch_at: (originalSettings && originalSettings.first_launch_at) || new Date().toISOString(),
   };
 }
 
@@ -293,19 +280,22 @@ function flashSaved() {
 els.saveKey.addEventListener("click", async () => {
   const v = els.apiKey.value.trim();
   if (!v) { toast("Paste a key first.", "error"); return; }
+  const provider = els.provider.value;
   els.saveKey.disabled = true;
-  setKeyStatus("loading", "Validating…");
+  setKeyStatus("loading", "Saving…");
   try {
-    await invoke("save_api_key", { key: v });
-    // Probe with a tiny request
+    await invoke("save_api_key", { provider, key: v });
+    // Persist current provider+model so validate_api_key uses the right config.
+    await invoke("save_settings", { settings: readSettings() });
+    setKeyStatus("loading", "Verifying…");
     try {
       await invoke("validate_api_key");
       setKeyStatus("ok", "API key verified");
       els.apiKey.value = "";
-      toast("API key saved and verified.", "success");
+      toast("Key saved and verified.", "success");
     } catch (e) {
-      setKeyStatus("warn", "Saved, but couldn't verify: " + e);
-      toast("Saved, but Anthropic didn't accept it.", "error");
+      setKeyStatus("warn", "Saved, but verify failed: " + e);
+      toast("Saved, but the provider didn't accept it.", "error");
     }
   } catch (e) {
     setKeyStatus("danger", String(e));
@@ -316,17 +306,16 @@ els.saveKey.addEventListener("click", async () => {
 });
 
 els.clearKey.addEventListener("click", async () => {
-  await invoke("clear_api_key");
-  await refreshKeyStatus();
+  await invoke("clear_api_key", { provider: els.provider.value });
+  await refreshKeyStatus(els.provider.value);
   toast("API key removed.", "success");
 });
 
 els.saveAll.addEventListener("click", async () => {
   try {
-    const s = readSettings();
-    await invoke("save_settings", { settings: s });
+    await invoke("save_settings", { settings: readSettings() });
     try { await invoke("set_autostart", { enabled: els.autostart.checked }); } catch (_) {}
-    originalSettings = s;
+    originalSettings = readSettings();
     flashSaved();
   } catch (e) {
     toast("Failed to save: " + e, "error");
@@ -335,7 +324,9 @@ els.saveAll.addEventListener("click", async () => {
 
 els.revert.addEventListener("click", () => {
   if (!originalSettings) return;
+  els.provider.value = originalSettings.provider;
   els.model.value = originalSettings.model;
+  applyProvider(originalSettings.provider, { resetModel: false });
   els.summon.value = originalSettings.summon_hotkey;
   els.action.value = originalSettings.action_hotkey;
   els.count.value = originalSettings.suggestion_count;
@@ -345,7 +336,6 @@ els.revert.addEventListener("click", () => {
   renderHotkey(originalSettings.summon_hotkey, els.summonKeys);
   renderHotkey(originalSettings.action_hotkey, els.actionKeys);
   updateCountDisplay();
-  updateModelCost();
   toast("Reverted.", "info");
 });
 
@@ -359,11 +349,10 @@ els.activateLicense.addEventListener("click", async () => {
 });
 
 els.resetAll.addEventListener("click", async () => {
-  if (!confirm("Reset all settings and remove your API key? This can't be undone.")) return;
+  if (!confirm("Reset all settings and remove every saved API key? This can't be undone.")) return;
   try {
     await invoke("reset_all");
     await loadAll();
-    await refreshKeyStatus();
     toast("Everything reset.", "success");
   } catch (e) {
     toast("Reset failed: " + e, "error");
@@ -371,7 +360,6 @@ els.resetAll.addEventListener("click", async () => {
 });
 
 els.count.addEventListener("input", updateCountDisplay);
-els.model.addEventListener("change", updateModelCost);
 
 els.checkUpdates.addEventListener("click", async () => {
   els.updateStatus.className = "status-line is-loading";
@@ -390,12 +378,7 @@ els.checkUpdates.addEventListener("click", async () => {
 });
 
 els.trialBuy.addEventListener("click", async () => {
-  try {
-    if (opener && opener.openUrl) await opener.openUrl("https://gumroad.com");
-  } catch (_) {}
+  try { if (opener && opener.openUrl) await opener.openUrl("https://gumroad.com"); } catch (_) {}
 });
 
-// Init
-(async () => {
-  await Promise.all([loadAll(), refreshKeyStatus(), refreshLicense()]);
-})();
+(async () => { await Promise.all([loadAll(), refreshLicense()]); })();

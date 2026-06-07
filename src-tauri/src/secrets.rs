@@ -1,38 +1,50 @@
-//! API-key storage using the OS credential store (Windows Credential Manager).
-//!
-//! Key is NEVER written to settings.json — only the OS keychain.
+//! API-key storage via OS credential store (Windows Credential Manager).
+//! One entry per provider so switching providers preserves all keys.
 
 use anyhow::{Context, Result};
 use keyring::Entry;
 
-const SERVICE: &str = "app.aiai.desktop";
-const USERNAME: &str = "anthropic-api-key";
+use crate::settings::Provider;
 
-fn entry() -> Result<Entry> {
-    Entry::new(SERVICE, USERNAME).context("create keyring entry")
+const SERVICE: &str = "app.aiai.desktop";
+
+fn entry_for(provider: Provider) -> Result<Entry> {
+    let username = format!("api-key-{}", provider.slug());
+    Entry::new(SERVICE, &username).context("create keyring entry")
 }
 
-pub fn set_api_key(value: &str) -> Result<()> {
-    entry()?
+pub fn set_api_key(provider: Provider, value: &str) -> Result<()> {
+    entry_for(provider)?
         .set_password(value)
         .context("write key to credential manager")
 }
 
-pub fn get_api_key() -> Result<Option<String>> {
-    match entry()?.get_password() {
+pub fn get_api_key(provider: Provider) -> Result<Option<String>> {
+    match entry_for(provider)?.get_password() {
         Ok(v) => Ok(Some(v)),
         Err(keyring::Error::NoEntry) => Ok(None),
         Err(e) => Err(anyhow::anyhow!(e)),
     }
 }
 
-pub fn clear_api_key() -> Result<()> {
-    match entry()?.delete_credential() {
+pub fn clear_api_key(provider: Provider) -> Result<()> {
+    match entry_for(provider)?.delete_credential() {
         Ok(_) | Err(keyring::Error::NoEntry) => Ok(()),
         Err(e) => Err(anyhow::anyhow!(e)),
     }
 }
 
-pub fn has_api_key() -> bool {
-    matches!(get_api_key(), Ok(Some(_)))
+pub fn has_api_key(provider: Provider) -> bool {
+    matches!(get_api_key(provider), Ok(Some(_)))
+}
+
+pub fn clear_all() {
+    for p in [
+        Provider::Anthropic,
+        Provider::OpenAI,
+        Provider::OpenRouter,
+        Provider::Gemini,
+    ] {
+        let _ = clear_api_key(p);
+    }
 }

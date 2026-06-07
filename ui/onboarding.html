@@ -13,6 +13,7 @@
       <span class="wizard-dot is-active" data-step="1"></span>
       <span class="wizard-dot" data-step="2"></span>
       <span class="wizard-dot" data-step="3"></span>
+      <span class="wizard-dot" data-step="4"></span>
     </div>
 
     <!-- Step 1: Welcome -->
@@ -20,7 +21,7 @@
       <div class="wizard-icon" data-icon="rocket"></div>
       <h1 class="wizard-title">Welcome to AI-AI</h1>
       <p class="wizard-body">
-        A prompt copilot for Claude Desktop. Two hotkeys, one tray icon, no other windows in your way.
+        A prompt copilot for Claude Desktop. Two hotkeys, one tray icon, your choice of AI provider.
       </p>
       <div class="wizard-shortcut-demo">
         <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> summons suggestions above Claude's chat input.
@@ -30,22 +31,43 @@
       </div>
     </section>
 
-    <!-- Step 2: API key -->
+    <!-- Step 2: Provider -->
     <section class="wizard-step" data-step="2">
-      <div class="wizard-icon" data-icon="key"></div>
-      <h1 class="wizard-title">Your Anthropic key</h1>
+      <div class="wizard-icon" data-icon="sliders"></div>
+      <h1 class="wizard-title">Pick an AI provider</h1>
       <p class="wizard-body">
-        AI-AI uses your own key so prompts never touch our servers. Get one at
-        <a href="#" data-external="https://console.anthropic.com/settings/keys">console.anthropic.com</a>.
+        AI-AI works with four providers. <strong>Gemini Flash</strong> is the cheapest (≈$0.0001 per call). You can change this any time in Settings.
       </p>
       <div class="wizard-field">
-        <input id="key-input" type="password" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+        <select id="provider-select" style="margin-bottom: 12px;">
+          <option value="gemini">Google Gemini — cheapest (≈$0.0001 / call)</option>
+          <option value="openai">OpenAI — gpt-4o-mini (≈$0.0003 / call)</option>
+          <option value="openrouter">OpenRouter — many models, has free tier</option>
+          <option value="anthropic">Anthropic Claude (≈$0.001 / call)</option>
+        </select>
+        <div class="field-hint" id="provider-info" style="text-align: left;"></div>
+      </div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-go="1">Back</button>
+        <button class="btn btn-primary" data-go="3">Next</button>
+      </div>
+    </section>
+
+    <!-- Step 3: API key -->
+    <section class="wizard-step" data-step="3">
+      <div class="wizard-icon" data-icon="key"></div>
+      <h1 class="wizard-title" id="key-title">Your API key</h1>
+      <p class="wizard-body" id="key-blurb">
+        AI-AI uses your own key. Prompts never touch our servers.
+      </p>
+      <div class="wizard-field">
+        <input id="key-input" type="password" placeholder="..." autocomplete="off" spellcheck="false" />
         <div class="field-hint" id="key-feedback" style="text-align: left;">
           Stored only in Windows Credential Manager.
         </div>
       </div>
       <div class="wizard-actions">
-        <button class="btn btn-ghost" data-go="1">Back</button>
+        <button class="btn btn-ghost" data-go="2">Back</button>
         <button class="btn btn-primary" id="save-key-btn">
           <span data-icon="check"></span> Save & continue
         </button>
@@ -53,8 +75,8 @@
       </div>
     </section>
 
-    <!-- Step 3: Ready -->
-    <section class="wizard-step" data-step="3">
+    <!-- Step 4: Ready -->
+    <section class="wizard-step" data-step="4">
       <div class="wizard-icon" data-icon="check"></div>
       <h1 class="wizard-title">You're ready</h1>
       <p class="wizard-body">
@@ -76,6 +98,7 @@
 
   <div id="toast-root"></div>
   <script src="icons.js"></script>
+  <script src="providers.js"></script>
   <script src="onboarding.js"></script>
 </body>
 </html>

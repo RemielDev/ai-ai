@@ -1,4 +1,4 @@
-//! Tauri IPC commands invoked from the overlay, settings, and onboarding frontends.
+//! Tauri IPC commands.
 
 use std::sync::Arc;
 
@@ -9,7 +9,7 @@ use tauri_plugin_autostart::ManagerExt as AutostartManagerExt;
 use crate::hotkey;
 use crate::license::{self, LicenseStatus};
 use crate::secrets;
-use crate::settings::{self, Settings, TrialStatus};
+use crate::settings::{self, Provider, Settings, TrialStatus};
 use crate::state::AppState;
 use crate::suggester::current_suggester;
 
@@ -19,35 +19,63 @@ pub struct AppInfo {
     pub suggestions_today: u32,
 }
 
+#[derive(Serialize)]
+pub struct ProviderKeyStatus {
+    pub anthropic: bool,
+    pub openai: bool,
+    pub openrouter: bool,
+    pub gemini: bool,
+}
+
+fn validate_key_format(provider: Provider, key: &str) -> Result<(), String> {
+    let hint = provider.key_prefix_hint();
+    if !key.starts_with(hint) {
+        return Err(format!(
+            "{} keys typically start with `{}`. Double-check the value you pasted.",
+            provider.label(),
+            hint
+        ));
+    }
+    Ok(())
+}
+
 #[tauri::command]
-pub async fn save_api_key(key: String) -> Result<(), String> {
+pub async fn save_api_key(provider: Provider, key: String) -> Result<(), String> {
     let trimmed = key.trim();
     if trimmed.is_empty() {
         return Err("API key is empty.".into());
     }
-    if !trimmed.starts_with("sk-ant-") {
-        return Err("Anthropic API keys start with `sk-ant-`. Double-check the value you pasted.".into());
+    validate_key_format(provider, trimmed)?;
+    secrets::set_api_key(provider, trimmed).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_api_key_status(provider: Provider) -> bool {
+    secrets::has_api_key(provider)
+}
+
+#[tauri::command]
+pub fn get_all_key_status() -> ProviderKeyStatus {
+    ProviderKeyStatus {
+        anthropic: secrets::has_api_key(Provider::Anthropic),
+        openai: secrets::has_api_key(Provider::OpenAI),
+        openrouter: secrets::has_api_key(Provider::OpenRouter),
+        gemini: secrets::has_api_key(Provider::Gemini),
     }
-    secrets::set_api_key(trimmed).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn get_api_key_status() -> bool {
-    secrets::has_api_key()
-}
-
-#[tauri::command]
-pub fn clear_api_key() -> Result<(), String> {
-    secrets::clear_api_key().map_err(|e| e.to_string())
+pub fn clear_api_key(provider: Provider) -> Result<(), String> {
+    secrets::clear_api_key(provider).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub async fn validate_api_key(app: AppHandle) -> Result<(), String> {
-    let key = secrets::get_api_key()
-        .map_err(|e| e.to_string())?
-        .ok_or_else(|| "No API key configured.".to_string())?;
     let s = settings::current(&app);
-    let suggester = current_suggester(key, &s);
+    let key = secrets::get_api_key(s.provider)
+        .map_err(|e| e.to_string())?
+        .ok_or_else(|| format!("No API key configured for {}.", s.provider.label()))?;
+    let suggester = current_suggester(s.provider, key, &s);
     suggester.validate().await.map_err(|e| e.to_string())
 }
 
@@ -129,7 +157,7 @@ pub fn set_autostart(app: AppHandle, enabled: bool) -> Result<(), String> {
 #[tauri::command]
 pub fn reset_all(app: AppHandle) -> Result<(), String> {
     settings::reset(&app).map_err(|e| e.to_string())?;
-    let _ = secrets::clear_api_key();
+    secrets::clear_all();
     let s = settings::current(&app);
     hotkey::register_all(&app, &s).map_err(|e| e.to_string())?;
     Ok(())
@@ -142,6 +170,5 @@ pub fn mark_first_run_done(app: AppHandle) {
 
 #[tauri::command]
 pub async fn check_for_updates(_app: AppHandle) -> Result<String, String> {
-    // Stub. When the Tauri updater is wired with a real endpoint, replace this.
     Ok("You're on the latest version (0.1.0).".into())
 }
