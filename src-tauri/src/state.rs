@@ -7,6 +7,9 @@ use chrono::{Datelike, Utc};
 use parking_lot::Mutex;
 use sha2::{Digest, Sha256};
 
+use std::collections::VecDeque;
+use std::time::{Duration, Instant};
+
 use crate::suggester::Suggestion;
 
 #[derive(Default)]
@@ -107,11 +110,93 @@ impl UsageStats {
     }
 }
 
+/// Rate limiter — protects against hotkey spam (cooldown) and runaway cost
+/// (rolling-window cap). Both checks are cheap and lock-free in the common path.
+pub struct RateLimit {
+    last_summon:  Mutex<Option<Instant>>,
+    last_improve: Mutex<Option<Instant>>,
+    window:       Mutex<VecDeque<Instant>>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RateAction { Summon, Improve, Regenerate }
+
+#[derive(Debug)]
+pub enum RateVerdict {
+    Allowed,
+    Cooldown { wait_ms: u128 },
+    WindowExceeded { resets_in_ms: u128 },
+}
+
+impl RateLimit {
+    pub fn new() -> Self {
+        Self {
+            last_summon:  Mutex::new(None),
+            last_improve: Mutex::new(None),
+            window:       Mutex::new(VecDeque::with_capacity(80)),
+        }
+    }
+
+    /// Hard caps: 60 calls per 60s rolling window.
+    const WINDOW_MAX: usize = 60;
+    const WINDOW_DURATION: Duration = Duration::from_secs(60);
+
+    /// Cooldowns per action to prevent accidental double-fire.
+    fn cooldown(action: RateAction) -> Duration {
+        match action {
+            RateAction::Summon     => Duration::from_millis(800),
+            RateAction::Improve    => Duration::from_millis(1200),
+            RateAction::Regenerate => Duration::from_millis(600),
+        }
+    }
+
+    pub fn check(&self, action: RateAction) -> RateVerdict {
+        let now = Instant::now();
+
+        // 1) Per-action cooldown
+        let slot = match action {
+            RateAction::Summon | RateAction::Regenerate => &self.last_summon,
+            RateAction::Improve => &self.last_improve,
+        };
+        if let Some(last) = *slot.lock() {
+            let cd = Self::cooldown(action);
+            let elapsed = now.saturating_duration_since(last);
+            if elapsed < cd {
+                return RateVerdict::Cooldown { wait_ms: (cd - elapsed).as_millis() };
+            }
+        }
+
+        // 2) Rolling window
+        let mut win = self.window.lock();
+        while let Some(&front) = win.front() {
+            if now.saturating_duration_since(front) > Self::WINDOW_DURATION {
+                win.pop_front();
+            } else {
+                break;
+            }
+        }
+        if win.len() >= Self::WINDOW_MAX {
+            let resets_in = if let Some(&front) = win.front() {
+                Self::WINDOW_DURATION.saturating_sub(now.saturating_duration_since(front))
+            } else {
+                Duration::ZERO
+            };
+            return RateVerdict::WindowExceeded { resets_in_ms: resets_in.as_millis() };
+        }
+
+        // Commit: record fire
+        *slot.lock() = Some(now);
+        win.push_back(now);
+        RateVerdict::Allowed
+    }
+}
+
 pub struct AppState {
     pub variation: Arc<VariationCache>,
     pub current_batch: Mutex<Vec<Suggestion>>,
     pub current_snapshot: Mutex<Option<crate::reader::ChatSnapshot>>,
     pub usage: Arc<UsageStats>,
+    pub rate_limit: Arc<RateLimit>,
 }
 
 impl AppState {
@@ -121,6 +206,7 @@ impl AppState {
             current_batch: Mutex::new(Vec::new()),
             current_snapshot: Mutex::new(None),
             usage: Arc::new(UsageStats::default()),
+            rate_limit: Arc::new(RateLimit::new()),
         }
     }
 }

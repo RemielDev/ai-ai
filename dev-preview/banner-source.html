@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="../ui/style.css" />
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden;
+      font-family: var(--font-sans);
+    }
+    body {
+      background:
+        radial-gradient(900px 500px at 78% 18%, rgba(255, 119, 82, 0.15), transparent 60%),
+        radial-gradient(700px 400px at 12% 90%, rgba(96, 165, 250, 0.07), transparent 60%),
+        linear-gradient(180deg, #0d0e12 0%, #08090d 100%);
+      color: var(--text-primary);
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 48px;
+      padding: 64px 80px;
+      box-sizing: border-box;
+    }
+    .left { display: flex; flex-direction: column; justify-content: center; }
+    .mark-wrap { display: flex; align-items: center; gap: 22px; margin-bottom: 32px; }
+    .mark-wrap svg { width: 88px; height: 88px; filter: drop-shadow(0 18px 36px rgba(255, 119, 82, 0.35)); }
+    .wordmark {
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      color: #fff;
+    }
+    .tagline {
+      font-size: 28px;
+      line-height: 1.32;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      max-width: 600px;
+      margin-bottom: 28px;
+    }
+    .tagline em {
+      font-style: normal;
+      color: var(--c-accent-500);
+      font-weight: 600;
+    }
+    .pills { display: flex; flex-wrap: wrap; gap: 12px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+    .pill kbd {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* Right: an actual overlay mock pinned in space */
+    .right { display: grid; place-items: center; position: relative; }
+    .glow {
+      position: absolute; inset: 0;
+      background: radial-gradient(360px 240px at 50% 50%, rgba(255, 119, 82, 0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .overlay {
+      width: 520px;
+      background: linear-gradient(180deg, #16181d 0%, #0e0f14 100%);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 6px 18px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+    .ovl-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .ovl-brand { display: flex; align-items: center; gap: 10px; }
+    .ovl-brand svg { width: 22px; height: 22px; }
+    .ovl-name { font-weight: 600; font-size: 14px; color: #fff; letter-spacing: 0.3px; }
+    .ovl-sub  { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
+
+    .ovl-list { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+    .ovl-row {
+      display: flex; gap: 12px; padding: 11px 14px;
+      border-radius: 10px; align-items: flex-start;
+    }
+    .ovl-row.is-active {
+      background: rgba(255, 119, 82, 0.14);
+      border: 1px solid rgba(255, 119, 82, 0.42);
+    }
+    .ovl-num {
+      width: 22px; height: 22px; flex-shrink: 0;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-tertiary);
+      border-radius: 6px;
+      display: grid; place-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .ovl-row.is-active .ovl-num {
+      background: var(--c-accent-500);
+      color: #1a0d06;
+    }
+    .ovl-text { color: var(--text-primary); font-size: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="mark-wrap">
+      <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"  stop-color="#FF8E5E"/>
+            <stop offset="100%" stop-color="#D9461A"/>
+          </linearGradient>
+          <linearGradient id="sheen2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
+            <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+        </defs>
+        <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg2)"/>
+        <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#sheen2)"/>
+        <rect x="8" y="8" width="240" height="240" rx="56"
+              fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+        <path d="M 72 152 L 128 96 L 184 152" stroke="#fff" stroke-width="22"
+              fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 96 180 L 128 148 L 160 180" stroke="rgba(255,255,255,0.55)"
+              stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="128" cy="76" r="9" fill="#fff"/>
+        <circle cx="128" cy="76" r="14" fill="none" stroke="#fff" stroke-width="2" opacity="0.45"/>
+      </svg>
+      <div class="wordmark">AI-AI</div>
+    </div>
+
+    <div class="tagline">
+      The <em>prompt copilot</em> for Claude Desktop.<br/>
+      Reads your last response, suggests what to ask next.
+    </div>
+
+    <div class="pills">
+      <span class="pill"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> summon</span>
+      <span class="pill"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> paste / improve</span>
+      <span class="pill">Gemini · OpenAI · OpenRouter · Anthropic</span>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="glow"></div>
+    <div class="overlay">
+      <div class="ovl-head">
+        <div class="ovl-brand">
+          <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%"  stop-color="#FF8E5E"/>
+                <stop offset="100%" stop-color="#D9461A"/>
+              </linearGradient>
+            </defs>
+            <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg3)"/>
+            <path d="M 72 152 L 128 96 L 184 152" stroke="#fff" stroke-width="22"
+                  fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 96 180 L 128 148 L 160 180" stroke="rgba(255,255,255,0.55)"
+                  stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="128" cy="76" r="9" fill="#fff"/>
+          </svg>
+          <span class="ovl-name">AI-AI</span>
+          <span class="ovl-sub">4 ideas</span>
+        </div>
+      </div>
+      <div class="ovl-list">
+        <div class="ovl-row is-active">
+          <span class="ovl-num">1</span>
+          <span class="ovl-text">What are the edge cases this design doesn't cover yet?</span>
+        </div>
+        <div class="ovl-row">
+          <span class="ovl-num">2</span>
+          <span class="ovl-text">Walk me through how this handles concurrent writes.</span>
+        </div>
+        <div class="ovl-row">
+          <span class="ovl-num">3</span>
+          <span class="ovl-text">Show a worked example with realistic input data.</span>
+        </div>
+        <div class="ovl-row">
+          <span class="ovl-num">4</span>
+          <span class="ovl-text">How does this approach scale to 100× the load?</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

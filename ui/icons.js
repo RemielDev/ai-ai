@@ -61,6 +61,25 @@ const ICONS = {
     <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
     <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
   </svg>`,
+  brand: `<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;width:100%;height:100%;">
+    <defs>
+      <linearGradient id="bm-bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FF8E5E"/>
+        <stop offset="100%" stop-color="#D9461A"/>
+      </linearGradient>
+      <linearGradient id="bm-sh" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
+        <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
+      </linearGradient>
+    </defs>
+    <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bm-bg)"/>
+    <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bm-sh)"/>
+    <rect x="8" y="8" width="240" height="240" rx="56" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+    <path d="M 72 152 L 128 96 L 184 152" stroke="#fff" stroke-width="22" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 96 180 L 128 148 L 160 180" stroke="rgba(255,255,255,0.55)" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="128" cy="76" r="9" fill="#fff"/>
+    <circle cx="128" cy="76" r="14" fill="none" stroke="#fff" stroke-width="2" opacity="0.45"/>
+  </svg>`,
 };
 
 window.icon = function (name) {

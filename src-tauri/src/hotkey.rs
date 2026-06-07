@@ -14,7 +14,7 @@ use tracing::{debug, info, warn};
 use crate::reader::{self, ChatSnapshot};
 use crate::secrets;
 use crate::settings::{self, Settings};
-use crate::state::AppState;
+use crate::state::{AppState, RateAction, RateVerdict};
 use crate::suggester::{current_suggester, Suggestion};
 
 #[derive(Serialize, Clone)]
@@ -78,6 +78,25 @@ async fn on_summon(app: AppHandle, settings: Settings) -> Result<()> {
             "Open Claude Desktop and click into the chat first.",
         );
         return Ok(());
+    }
+
+    match app.state::<Arc<AppState>>().rate_limit.check(RateAction::Summon) {
+        RateVerdict::Allowed => {}
+        RateVerdict::Cooldown { wait_ms } => {
+            debug!(wait_ms, "summon cooldown — ignored");
+            return Ok(());
+        }
+        RateVerdict::WindowExceeded { resets_in_ms } => {
+            notify(
+                &app,
+                "AI-AI — slow down",
+                &format!(
+                    "60 calls / minute reached. Try again in {}s.",
+                    (resets_in_ms / 1000).max(1)
+                ),
+            );
+            return Ok(());
+        }
     }
     let snapshot = match reader::snapshot() {
         Ok(s) => s,
@@ -145,6 +164,19 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
     if draft.is_empty() {
         notify(&app, "AI-AI", "Type something first, then press the hotkey.");
         return Ok(());
+    }
+
+    match app.state::<Arc<AppState>>().rate_limit.check(RateAction::Improve) {
+        RateVerdict::Allowed => {}
+        RateVerdict::Cooldown { .. } => return Ok(()),
+        RateVerdict::WindowExceeded { resets_in_ms } => {
+            notify(
+                &app,
+                "AI-AI — slow down",
+                &format!("Rate cap hit. Try again in {}s.", (resets_in_ms / 1000).max(1)),
+            );
+            return Ok(());
+        }
     }
 
     let Some(api_key) = secrets::get_api_key(settings.provider).ok().flatten() else {
@@ -269,6 +301,11 @@ fn spawn_generation(
 
 pub fn regenerate(app: AppHandle) -> Result<()> {
     let settings = settings::current(&app);
+    match app.state::<Arc<AppState>>().rate_limit.check(RateAction::Regenerate) {
+        RateVerdict::Allowed => {}
+        RateVerdict::Cooldown { .. } => anyhow::bail!("Slow down — wait a moment before regenerating."),
+        RateVerdict::WindowExceeded { .. } => anyhow::bail!("Rate cap reached. Wait a minute and retry."),
+    }
     let snapshot = app
         .state::<Arc<AppState>>()
         .current_snapshot

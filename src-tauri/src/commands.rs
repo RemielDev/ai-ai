@@ -168,7 +168,42 @@ pub fn mark_first_run_done(app: AppHandle) {
     settings::mark_first_run_complete(&app);
 }
 
+/// Stub now; will hit GitHub releases once a release exists.
 #[tauri::command]
 pub async fn check_for_updates(_app: AppHandle) -> Result<String, String> {
-    Ok("You're on the latest version (0.1.0).".into())
+    use reqwest::header;
+    let client = match reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(8))
+        .user_agent(concat!("AI-AI/", env!("CARGO_PKG_VERSION")))
+        .build()
+    {
+        Ok(c) => c,
+        Err(e) => return Err(e.to_string()),
+    };
+    let resp = match client
+        .get("https://api.github.com/repos/RemielDev/ai-ai/releases/latest")
+        .header(header::ACCEPT, "application/vnd.github+json")
+        .send()
+        .await
+    {
+        Ok(r) => r,
+        Err(_) => return Ok(format!("Offline. Currently on v{}.", env!("CARGO_PKG_VERSION"))),
+    };
+    if resp.status() == reqwest::StatusCode::NOT_FOUND {
+        return Ok(format!("No releases yet. Currently on v{}.", env!("CARGO_PKG_VERSION")));
+    }
+    if !resp.status().is_success() {
+        return Ok(format!("Couldn't reach GitHub ({}). On v{}.", resp.status(), env!("CARGO_PKG_VERSION")));
+    }
+    let body: serde_json::Value = match resp.json().await {
+        Ok(v) => v,
+        Err(_) => return Ok(format!("On v{}.", env!("CARGO_PKG_VERSION"))),
+    };
+    let latest = body["tag_name"].as_str().unwrap_or("").trim_start_matches('v').to_string();
+    let current = env!("CARGO_PKG_VERSION").to_string();
+    if latest.is_empty() || latest == current {
+        Ok(format!("You're on the latest version (v{current})."))
+    } else {
+        Ok(format!("Update available: v{latest} (you have v{current}). Visit github.com/RemielDev/ai-ai/releases."))
+    }
 }

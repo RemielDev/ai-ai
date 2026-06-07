@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    html, body { margin: 0; padding: 0; background: transparent; }
+    body { display: grid; place-items: center; min-height: 100vh; }
+    .stage { background: transparent; }
+  </style>
+</head>
+<body>
+  <!-- The single source-of-truth logo, rendered at 1024 for crisp downscaling. -->
+  <div class="stage" id="stage">
+    <svg width="1024" height="1024" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#FF8E5E"/>
+          <stop offset="100%" stop-color="#D9461A"/>
+        </linearGradient>
+        <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="rgba(255,255,255,0.22)"/>
+          <stop offset="55%"  stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+        <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="6"/>
+        </filter>
+      </defs>
+
+      <!-- Backplate -->
+      <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)"/>
+      <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#sheen)"/>
+      <rect x="8" y="8" width="240" height="240" rx="56"
+            fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+
+      <!-- Mark: two stacked chevrons + a connecting spark, suggesting "prompt loop / iterate" -->
+      <!-- Top chevron, pointing up-right -->
+      <path d="M 72 152 L 128 96 L 184 152"
+            stroke="#FFFFFF" stroke-width="22" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Lower chevron, smaller, offset, pointing up-right (the "echo") -->
+      <path d="M 96 180 L 128 148 L 160 180"
+            stroke="rgba(255,255,255,0.55)" stroke-width="16" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- Spark at top -->
+      <circle cx="128" cy="76" r="9" fill="#FFFFFF"/>
+      <circle cx="128" cy="76" r="14" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.45"/>
+    </svg>
+  </div>
+</body>
+</html>
