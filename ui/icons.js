@@ -49,9 +49,10 @@ const ICONS = {
     <path d="M9.5 1.5V5H13" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
   </svg>`,
   rocket: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M11.5 1.5C8 1.5 5 5 4 8l4 4c3-1 6.5-4 6.5-7.5 0-1.5 0-3-3-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="10" cy="6" r="1.2" stroke="currentColor" stroke-width="1.5"/>
-    <path d="M4 12L1.5 14.5M6 14L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M8 1.5c2.2 1.4 3.3 3.6 3.3 5.8 0 1.4-.4 2.7-1 3.7H5.7c-.6-1-1-2.3-1-3.7 0-2.2 1.1-4.4 3.3-5.8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M5.7 11l-1.5 1.5v2L6 13.5M10.3 11l1.5 1.5v2L10 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 14.5l1 1 1-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`,
   loader: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M8 1.5v3M8 11.5v3M14.5 8h-3M4.5 8h-3M12.6 3.4l-2.1 2.1M5.5 10.5l-2.1 2.1M12.6 12.6l-2.1-2.1M5.5 5.5L3.4 3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
