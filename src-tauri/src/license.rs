@@ -1,8 +1,8 @@
-//! License gate. v1 ships in dev-bypass mode that always returns Valid.
+//! Build identity.
 //!
-//! When a license server is deployed, swap `validate_with_server` into
-//! `status()`. The dev-bypass exists so the app is usable today while
-//! the Lemon Squeezy + Cloudflare Worker integration is set up.
+//! This open-source build is permanently free under MIT. The license/trial
+//! plumbing exists so the future Pro fork can swap in a real check without
+//! changing the UI contract.
 
 use serde::{Deserialize, Serialize};
 
@@ -16,16 +16,17 @@ pub struct LicenseStatus {
 pub fn status() -> LicenseStatus {
     LicenseStatus {
         valid: true,
-        tier: "dev-bypass".into(),
-        message: "License gate disabled in this build.".into(),
+        tier: "Free · MIT".into(),
+        message: "Open-source build. Every feature unlocked, forever.".into(),
     }
 }
 
 pub fn activate(_key: &str) -> LicenseStatus {
-    // TODO: POST to https://license.ai-ai.app/v1/check when worker is deployed.
+    // No license keys in the OS build. Pro version (separate codebase) will
+    // implement real activation.
     LicenseStatus {
         valid: true,
-        tier: "dev-bypass".into(),
-        message: "License gate disabled in this build.".into(),
+        tier: "Free · MIT".into(),
+        message: "This is the open-source build — no license needed.".into(),
     }
 }

@@ -25,7 +25,7 @@
       "icons/icon.png",
       "icons/icon.ico"
     ],
-    "copyright": "Copyright (c) 2026 Remie",
+    "copyright": "Copyright (c) 2026 RemielDev — MIT",
     "category": "Productivity",
     "shortDescription": "AI-powered prompt copilot for Claude Desktop",
     "longDescription": "AI-AI sits in your tray and gives you AI-generated follow-up prompts and on-demand prompt improvement, with one hotkey. Bring your own Anthropic API key.",

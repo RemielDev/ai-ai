@@ -33,8 +33,6 @@ const els = {
   // Privacy
   telemetry:     document.getElementById("telemetry"),
   licenseStatus: document.getElementById("license-status"),
-  licenseKey:    document.getElementById("license-key"),
-  activateLicense: document.getElementById("activate-license"),
   resetAll:      document.getElementById("reset-all"),
   // About
   appVersion:    document.getElementById("app-version"),
@@ -42,10 +40,7 @@ const els = {
   aboutCount:    document.getElementById("about-count"),
   checkUpdates:  document.getElementById("check-updates"),
   updateStatus:  document.getElementById("update-status"),
-  // Trial
-  trialBanner:   document.getElementById("trial-banner"),
-  trialDays:     document.getElementById("trial-days-left"),
-  trialBuy:      document.getElementById("trial-buy"),
+  // (Trial removed — this is the OSS build, always free.)
   // Actions
   saveAll:       document.getElementById("save-all"),
   revert:        document.getElementById("revert"),
@@ -194,19 +189,8 @@ async function refreshKeyStatus(provider) {
   }
 }
 
-async function refreshLicense() {
-  try {
-    const s = await invoke("license_status");
-    els.licenseStatus.className = "status-line " + (s.valid ? "is-ok" : "is-warn");
-    els.licenseStatus.innerHTML =
-      `<span data-icon="${s.valid ? "check" : "alert"}"></span> ${s.tier} — ${s.message}`;
-    window.injectIcons(els.licenseStatus);
-  } catch (e) {
-    els.licenseStatus.className = "status-line is-danger";
-    els.licenseStatus.innerHTML = `<span data-icon="alert"></span> ${e}`;
-    window.injectIcons(els.licenseStatus);
-  }
-}
+// License panel is static in OSS build; no async refresh needed.
+async function refreshLicense() { /* no-op */ }
 
 function updateCountDisplay() {
   els.countDisplay.textContent = `${els.count.value} suggestions`;
@@ -244,15 +228,6 @@ async function loadAll() {
     }
   } catch (_) {}
 
-  try {
-    const trial = await invoke("trial_status");
-    if (trial && trial.in_trial) {
-      els.trialDays.textContent = trial.days_left;
-      els.trialBanner.classList.remove("hidden");
-    } else {
-      els.trialBanner.classList.add("hidden");
-    }
-  } catch (_) {}
 }
 
 function readSettings() {
@@ -339,14 +314,7 @@ els.revert.addEventListener("click", () => {
   toast("Reverted.", "info");
 });
 
-els.activateLicense.addEventListener("click", async () => {
-  const k = els.licenseKey.value.trim();
-  if (!k) { toast("Paste a license key first.", "error"); return; }
-  const s = await invoke("activate_license", { key: k });
-  await refreshLicense();
-  if (s.valid) toast("License activated.", "success");
-  else toast("Activation failed: " + s.message, "error");
-});
+// Activate-license removed in OSS build.
 
 els.resetAll.addEventListener("click", async () => {
   if (!confirm("Reset all settings and remove every saved API key? This can't be undone.")) return;
@@ -377,8 +345,9 @@ els.checkUpdates.addEventListener("click", async () => {
   }
 });
 
-els.trialBuy.addEventListener("click", async () => {
-  try { if (opener && opener.openUrl) await opener.openUrl("https://gumroad.com"); } catch (_) {}
+const starCta = document.getElementById("star-cta");
+if (starCta) starCta.addEventListener("click", async () => {
+  try { if (opener && opener.openUrl) await opener.openUrl("https://github.com/RemielDev/ai-ai"); } catch (_) {}
 });
 
 (async () => { await Promise.all([loadAll(), refreshLicense()]); })();

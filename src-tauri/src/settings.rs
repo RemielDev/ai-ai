@@ -7,6 +7,7 @@ use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
 const STORE_FILE: &str = "settings.json";
+#[allow(dead_code)]
 pub const TRIAL_DAYS: i64 = 7;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -162,13 +163,7 @@ pub struct TrialStatus {
     pub days_left: i64,
 }
 
-pub fn trial_status(app: &AppHandle) -> TrialStatus {
-    let s = current(app);
-    let now = Utc::now();
-    let elapsed = (now - s.first_launch_at).num_days();
-    let left = (TRIAL_DAYS - elapsed).max(0);
-    TrialStatus {
-        in_trial: left > 0,
-        days_left: left,
-    }
+pub fn trial_status(_app: &AppHandle) -> TrialStatus {
+    // Open-source build is free forever — there is no trial.
+    TrialStatus { in_trial: false, days_left: 0 }
 }

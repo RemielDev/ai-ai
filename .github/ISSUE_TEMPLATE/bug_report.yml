@@ -1,0 +1,40 @@
+name: Bug report
+description: Something broke or behaved unexpectedly.
+labels: ["bug"]
+body:
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Run `winver` and paste the version line.
+      placeholder: "Windows 11 23H2 (Build 22631.3296)"
+    validations: { required: true }
+  - type: input
+    id: claude
+    attributes:
+      label: Claude Desktop version
+      placeholder: "0.7.x — Help → About"
+  - type: input
+    id: aiai
+    attributes:
+      label: AI-AI version
+      description: Settings → About tab.
+      placeholder: "0.1.0"
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open Claude Desktop, click into chat\n2. Press Ctrl+Shift+Space\n3. ..."
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations: { required: true }
+  - type: textarea
+    id: log
+    attributes:
+      label: Crash log (if any)
+      description: Paste relevant lines from `%APPDATA%\ai-ai\crash.log`
+      render: text

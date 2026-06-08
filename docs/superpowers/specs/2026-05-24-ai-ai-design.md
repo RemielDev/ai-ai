@@ -2,7 +2,7 @@
 
 **Status:** Approved for implementation planning
 **Date:** 2026-05-24
-**Owner:** Remie
+**Owner:** RemielDev
 **Platform (v1):** Windows 11, Claude Desktop app (current version)
 
 ---

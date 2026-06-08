@@ -2,7 +2,10 @@
 name = "ai-ai"
 version = "0.1.0"
 description = "AI-powered prompt copilot for Claude Desktop"
-authors = ["Remie"]
+authors = ["RemielDev"]
+license = "MIT"
+repository = "https://github.com/RemielDev/ai-ai"
+homepage = "https://github.com/RemielDev/ai-ai"
 edition = "2021"
 rust-version = "1.77"
 

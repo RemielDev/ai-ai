@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/RemielDev/ai-ai/discussions
+    about: Ask questions, share use cases, or float ideas before opening an issue.

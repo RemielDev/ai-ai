@@ -17,13 +17,13 @@
       <span class="app-version" id="app-version">v0.1.0</span>
     </header>
 
-    <div class="banner is-info hidden" id="trial-banner">
+    <div class="banner is-info" id="oss-banner">
       <span data-icon="spark"></span>
       <div class="banner-body">
-        <strong>Trial active</strong> — <span id="trial-days-left">7</span> days remaining.
-        After trial, AI-AI keeps working but updates require a license.
+        <strong>Free &amp; open source</strong> — MIT licensed. A polished, hosted
+        Pro version is coming. <a href="#" data-external="https://github.com/RemielDev/ai-ai">Star us on GitHub</a> to follow.
       </div>
-      <button class="banner-action" id="trial-buy">Get license</button>
+      <button class="banner-action" id="star-cta">Star repo</button>
     </div>
 
     <div class="banner is-danger hidden" id="key-missing-banner">
@@ -194,17 +194,23 @@
       </div>
 
       <div class="card">
-        <div class="card-header"><h2>License</h2></div>
-        <div id="license-status" class="status-line is-loading">
-          <span data-icon="loader"></span> Loading…
-        </div>
-        <div class="field" style="margin-top: 16px;">
-          <span class="field-label">Activate license</span>
-          <div class="row">
-            <input id="license-key" type="text" placeholder="Paste license key…" autocomplete="off" />
-            <button class="btn btn-primary" id="activate-license" type="button">Activate</button>
+        <div class="card-header">
+          <h2>Open source</h2>
+          <div id="license-status" class="status-line is-ok">
+            <span data-icon="check"></span> Free · MIT
           </div>
-          <div class="field-hint">Buy at <a href="#" data-external="https://gumroad.com">gumroad.com</a> — coming soon.</div>
+        </div>
+        <p class="card-desc">
+          AI-AI is MIT-licensed. Use it, fork it, build it into your stack — no strings.
+          A Pro version with hosted updates, premium models, and team features is on the roadmap.
+        </p>
+        <div class="row" style="margin-top: 14px;">
+          <button class="btn btn-secondary" data-external="https://github.com/RemielDev/ai-ai" type="button">
+            <span data-icon="doc"></span> View on GitHub
+          </button>
+          <button class="btn btn-ghost" data-external="https://github.com/RemielDev/ai-ai/releases" type="button">
+            Releases &amp; changelog
+          </button>
         </div>
       </div>
 
