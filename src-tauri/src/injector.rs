@@ -1,4 +1,4 @@
-//! Injector — pastes text into Claude Desktop's chat input.
+//! Injector - pastes text into Claude Desktop's chat input.
 //!
 //! Strategy:
 //! 1. Try the focused UIA Edit element's `ValuePattern.SetValue`. Fast and

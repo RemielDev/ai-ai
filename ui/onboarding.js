@@ -48,7 +48,7 @@ function refreshKeyStep() {
   const p = window.PROVIDERS[providerSelect.value];
   document.getElementById("key-title").textContent = `Your ${p.label} key`;
   document.getElementById("key-blurb").innerHTML =
-    `Get one at <a href="#" data-external="${p.consoleUrl}">${new URL(p.consoleUrl).host}</a>. AI-AI uses your key directly — prompts never touch our servers.`;
+    `Get one at <a href="#" data-external="${p.consoleUrl}">${new URL(p.consoleUrl).host}</a>. AI-AI uses your key directly - prompts never touch our servers.`;
   const input = document.getElementById("key-input");
   input.placeholder = `${p.keyPrefix}...`;
 }

@@ -1,4 +1,4 @@
-# AI-AI — Design Spec
+# AI-AI - Design Spec
 
 **Status:** Approved for implementation planning
 **Date:** 2026-05-24
@@ -13,10 +13,10 @@ AI-AI is a Windows tray app that gives Claude Desktop users an AI-powered copilo
 
 **Two features behind one tool:**
 
-1. **Suggest next prompt** (`Ctrl+Shift+Space`) — reads the most recent assistant response from the Claude Desktop window, generates 3–6 follow-up prompts, and shows them in a floating always-on-top overlay anchored above Claude's chat input.
-2. **Improve current prompt** (`Ctrl+Shift+Enter` while Claude's chat input is focused) — takes whatever the user has typed and rewrites it as a sharper, more effective prompt, replacing the contents in place.
+1. **Suggest next prompt** (`Ctrl+Shift+Space`) - reads the most recent assistant response from the Claude Desktop window, generates 3–6 follow-up prompts, and shows them in a floating always-on-top overlay anchored above Claude's chat input.
+2. **Improve current prompt** (`Ctrl+Shift+Enter` while Claude's chat input is focused) - takes whatever the user has typed and rewrites it as a sharper, more effective prompt, replacing the contents in place.
 
-**Context-aware hotkey overload — `Ctrl+Shift+Enter`:**
+**Context-aware hotkey overload - `Ctrl+Shift+Enter`:**
 
 | Focused window | Action |
 |---|---|
@@ -62,13 +62,13 @@ AI-AI is a Windows tray app that gives Claude Desktop users an AI-powered copilo
 | **Overlay UI** | Tauri webview window, frameless, always-on-top, anchored from `chat_input_bounds`. Renders 3–6 suggestion cards. Arrow-key + mouse nav. Loading & error states. Emits selected suggestion to backend. | Tauri events: `show(suggestions, anchor_rect)`, `hide()`, `selected(text)` | Tauri |
 | **Injector** | Write text into Claude's chat input. Primary path: UIA `ValuePattern.SetValue`. Fallback: clipboard set + `SendInput Ctrl+V`. Optionally simulate Enter when `auto_send=true`. | `paste(text, auto_send: bool) -> Result<()>` | UIA + `SendInput` |
 
-**Design rule:** any unit can be unit-tested by mocking its single dependency. ClaudeReader is the only unit with brittle external coupling — it gets the most test coverage and a clear fallback path.
+**Design rule:** any unit can be unit-tested by mocking its single dependency. ClaudeReader is the only unit with brittle external coupling - it gets the most test coverage and a clear fallback path.
 
 ---
 
 ## 3. Core flows
 
-### Flow A — Summon suggestions (`Ctrl+Shift+Space`)
+### Flow A - Summon suggestions (`Ctrl+Shift+Space`)
 
 1. `HotkeyDaemon` fires. Checks `ClaudeReader.is_claude_focused()`. If false, show toast "Open Claude Desktop first" and abort.
 2. `ClaudeReader.snapshot()` returns `ChatSnapshot`.
@@ -77,20 +77,20 @@ AI-AI is a Windows tray app that gives Claude Desktop users an AI-powered copilo
 5. When suggestions arrive, render 3–6 cards. First card auto-highlighted. Arrow keys navigate. `Esc` dismisses.
 6. `Ctrl+Shift+Space` pressed again while overlay open → regenerate with `variation_seed` incremented (see below).
 
-### Flow B — Paste suggestion (`Ctrl+Shift+Enter` while overlay focused)
+### Flow B - Paste suggestion (`Ctrl+Shift+Enter` while overlay focused)
 
 1. `HotkeyDaemon` fires. Sees overlay window has focus → routes to `Injector`.
 2. Frontend emits highlighted card text.
 3. `Injector.paste(text, settings.auto_send)`.
 4. Overlay closes. If `auto_send=false` (default), focus returns to Claude's chat box.
 
-### Flow C — Improve current prompt (`Ctrl+Shift+Enter` while Claude chat input focused)
+### Flow C - Improve current prompt (`Ctrl+Shift+Enter` while Claude chat input focused)
 
 1. `HotkeyDaemon` fires. Sees Claude chat input focused → routes to improve path.
 2. `ClaudeReader.snapshot()` → grabs `chat_input_text`. If empty, no-op + subtle toast "Type something to improve".
 3. Show small "improving…" indicator (1.5 s timeout for visible feedback) near caret position.
 4. `Suggester.improve_prompt(draft)` returns improved string.
-5. `Injector.paste(improved, auto_send=false)` — replaces chat input contents. Focus stays in chat box.
+5. `Injector.paste(improved, auto_send=false)` - replaces chat input contents. Focus stays in chat box.
 
 ### Variation-seed logic
 
@@ -154,7 +154,7 @@ Both prompts use `claude-haiku-4-6` by default (fast, cheap). Settings allow swi
 | Summon hotkey | `Ctrl+Shift+Space` | Rebind with live conflict detection (re-registers on save). |
 | Paste/Improve hotkey | `Ctrl+Shift+Enter` | Same. |
 | Number of suggestions | 4 | Range 3–6. |
-| Suggestion style preset | Default | Default / Concise / Exploratory / Technical — each is a small system-prompt addendum. |
+| Suggestion style preset | Default | Default / Concise / Exploratory / Technical - each is a small system-prompt addendum. |
 | Auto-send after paste | off | Toggle. When on, `Injector` simulates Enter after paste. |
 | Telemetry opt-in | off | Anonymous counts only. See below. |
 
@@ -164,18 +164,18 @@ Both prompts use `claude-haiku-4-6` by default (fast, cheap). Settings allow swi
 - On purchase, customer receives a license key by email.
 - First launch shows trial banner. Trial is 7 days, all features unlocked.
 - License check on launch: POST license key to a Cloudflare Worker (`https://license.ai-ai.app/v1/check`) which validates against the Lemon Squeezy API and returns `{ valid, expires_at, tier }`. Cache result for 7 days offline.
-- Pricing recommendation for v1: **$29 USD one-time, includes 1 year of updates. $9/yr to renew updates afterward.** App keeps working forever without renewing — only updates gated.
+- Pricing recommendation for v1: **$29 USD one-time, includes 1 year of updates. $9/yr to renew updates afterward.** App keeps working forever without renewing - only updates gated.
 
 ### Error handling
 
 | Condition | Behavior |
 |---|---|
 | Claude Desktop not running | Toast "Open Claude Desktop first" via tray notification. |
-| UIA returns empty / chat not detected | Fallback: take a screenshot of Claude's window, send to Anthropic vision endpoint using user's key, parse out last response. Show banner "Compatibility mode — slower" in overlay so user knows. |
+| UIA returns empty / chat not detected | Fallback: take a screenshot of Claude's window, send to Anthropic vision endpoint using user's key, parse out last response. Show banner "Compatibility mode - slower" in overlay so user knows. |
 | API key missing | Open settings panel with API key field focused + red helper text. |
 | API key invalid (401) | Toast "Invalid API key" → open settings. |
 | Network error | Retry once with 500 ms backoff. Then show overlay error state with "Retry" button. |
-| Rate limit (429) | Show overlay error "Anthropic rate limited — try again in a moment." |
+| Rate limit (429) | Show overlay error "Anthropic rate limited - try again in a moment." |
 | Hotkey already registered by another app | On settings save, show inline error "Hotkey in use by <app or unknown>" with red highlight. Old binding stays active. |
 | Suggester returns malformed JSON | One auto-retry. If still malformed, show generic error. |
 
@@ -194,9 +194,9 @@ Anonymous, no prompt content ever leaves the user's machine except to their own 
 
 ## 6. Out of scope (explicitly deferred)
 
-- macOS support — v2.
-- Web Claude (claude.ai in browser) — v2 via separate browser extension.
-- Reading further back than the last assistant message — v1 only reads the most recent turn.
+- macOS support - v2.
+- Web Claude (claude.ai in browser) - v2 via separate browser extension.
+- Reading further back than the last assistant message - v1 only reads the most recent turn.
 - Multi-conversation memory / cross-session suggestions.
 - Team/shared license keys.
 - Custom user-defined system prompts (only style presets in v1).

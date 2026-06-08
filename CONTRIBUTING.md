@@ -1,6 +1,6 @@
 # Contributing to AI-AI
 
-Thanks for reading. The codebase is small and unit-isolated — most contributions touch one file.
+Thanks for reading. The codebase is small and unit-isolated - most contributions touch one file.
 
 ## Setup
 
@@ -17,7 +17,7 @@ Installer lands in `src-tauri/target/release/bundle/nsis/`.
 
 ## Dev loop
 
-Fastest iteration cycle — no installer:
+Fastest iteration cycle - no installer:
 
 ```powershell
 cargo tauri build
@@ -56,7 +56,7 @@ Regenerates the 12 PNGs in `mockups/`. Run after any UI change so reviewers can 
 
 - Run `cargo check` (no errors, no new warnings).
 - Re-run `node dev-preview/snap.mjs` and commit any visual diff in `mockups/`.
-- Keep changes scoped — one feature or fix per PR.
+- Keep changes scoped - one feature or fix per PR.
 - Follow the existing logging style (`tracing::info!` / `warn!` with `?e` for errors).
 - For UI changes, ensure WCAG AA contrast and that `prefers-reduced-motion` works.
 
@@ -80,7 +80,7 @@ Adding a new provider means adding:
 3. A dispatch arm in `Suggester::call`
 4. An entry in `ui/providers.js` for the UI side
 
-Open an issue first so we can talk through the shape — some providers have quirks worth catching before code.
+Open an issue first so we can talk through the shape - some providers have quirks worth catching before code.
 
 ## License
 

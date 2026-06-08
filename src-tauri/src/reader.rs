@@ -1,4 +1,4 @@
-//! ClaudeReader — Windows UI Automation extraction of Claude Desktop chat.
+//! ClaudeReader - Windows UI Automation extraction of Claude Desktop chat.
 //!
 //! Strategy:
 //! 1. Find Claude Desktop window via process executable name (`Claude.exe`).
@@ -6,7 +6,7 @@
 //! 3. Locate the chat input (the bottom-most Edit / Document element).
 //! 4. Return a `ChatSnapshot`.
 //!
-//! The tree walk is heuristic by necessity — Electron apps don't expose
+//! The tree walk is heuristic by necessity - Electron apps don't expose
 //! semantic roles for chat-turn boundaries. We collect text nodes in
 //! tree order and treat the tail as the most recent assistant turn.
 //! When the heuristic fails (empty assistant_msg), the overlay shows a

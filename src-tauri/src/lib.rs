@@ -1,4 +1,4 @@
-//! AI-AI — prompt copilot for Claude Desktop.
+//! AI-AI - prompt copilot for Claude Desktop.
 
 mod commands;
 mod hotkey;
@@ -94,7 +94,7 @@ pub fn run() {
 
             let _tray = TrayIconBuilder::with_id("main")
                 .icon(app.default_window_icon().unwrap().clone())
-                .tooltip(format!("AI-AI v{} — prompt copilot for Claude", env!("CARGO_PKG_VERSION")))
+                .tooltip(format!("AI-AI v{} - prompt copilot for Claude", env!("CARGO_PKG_VERSION")))
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {
@@ -135,7 +135,7 @@ pub fn run() {
                 let _ = open_onboarding(app.handle());
             }
 
-            // Hide the autostart window on launch — we only want the tray.
+            // Hide the autostart window on launch - we only want the tray.
             let argv: Vec<String> = std::env::args().collect();
             let _silent_start = argv.iter().any(|a| a == "--autostart");
 
@@ -162,7 +162,7 @@ pub(crate) fn open_settings(app: &tauri::AppHandle) -> tauri::Result<()> {
         return Ok(());
     }
     WebviewWindowBuilder::new(app, "settings", WebviewUrl::App("settings.html".into()))
-        .title("AI-AI — Settings")
+        .title("AI-AI - Settings")
         .inner_size(760.0, 720.0)
         .min_inner_size(680.0, 560.0)
         .center()

@@ -1,4 +1,4 @@
-// Inline SVG icon library. Single source of truth — replaces Unicode glyphs.
+// Inline SVG icon library. Single source of truth - replaces Unicode glyphs.
 // Each icon is a 16x16 stroke-based shape, currentColor.
 
 const ICONS = {

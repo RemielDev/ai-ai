@@ -110,7 +110,7 @@ impl UsageStats {
     }
 }
 
-/// Rate limiter — protects against hotkey spam (cooldown) and runaway cost
+/// Rate limiter - protects against hotkey spam (cooldown) and runaway cost
 /// (rolling-window cap). Both checks are cheap and lock-free in the common path.
 pub struct RateLimit {
     last_summon:  Mutex<Option<Instant>>,

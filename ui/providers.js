@@ -1,4 +1,4 @@
-// Provider catalog — single source of truth for the UI side.
+// Provider catalog - single source of truth for the UI side.
 // The Rust side has its own copy in src-tauri/src/settings.rs.
 
 window.PROVIDERS = {

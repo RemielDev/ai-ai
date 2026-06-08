@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="brand/banner.png" alt="AI-AI — prompt copilot for Claude Desktop" width="100%" />
+  <img src="brand/banner.png" alt="AI-AI - prompt copilot for Claude Desktop" width="100%" />
 </p>
 
 <h3 align="center">
@@ -7,8 +7,8 @@
 </h3>
 
 <p align="center">
-  AI-AI sits in your Windows tray. Hit a hotkey — it reads your last Claude response and<br/>
-  suggests what to ask next. Hit another — it sharpens the draft you're already typing.
+  AI-AI sits in your Windows tray. Hit a hotkey - it reads your last Claude response and<br/>
+  suggests what to ask next. Hit another - it sharpens the draft you're already typing.
 </p>
 
 <p align="center">
@@ -28,18 +28,18 @@
 
 ## What it does
 
-You're deep in a Claude conversation. The response just landed. You want to keep going, but you don't know what to ask next — or you're typing something and want it sharper.
+You're deep in a Claude conversation. The response just landed. You want to keep going, but you don't know what to ask next - or you're typing something and want it sharper.
 
-**`Ctrl` + `Shift` + `Space`** — overlay above your chat input with 3–6 follow-up prompts. Arrow keys to pick. `Ctrl` + `Shift` + `Enter` pastes it.
+**`Ctrl` + `Shift` + `Space`** - overlay above your chat input with 3–6 follow-up prompts. Arrow keys to pick. `Ctrl` + `Shift` + `Enter` pastes it.
 
-**`Ctrl` + `Shift` + `Enter`** *(while typing in Claude)* — your draft is rewritten in place as a clearer, more specific prompt.
+**`Ctrl` + `Shift` + `Enter`** *(while typing in Claude)* - your draft is rewritten in place as a clearer, more specific prompt.
 
-That's it. Two hotkeys, one tray icon. Your keys, your wallet — AI-AI never proxies anything.
+That's it. Two hotkeys, one tray icon. Your keys, your wallet - AI-AI never proxies anything.
 
 <table>
   <tr>
     <td><img src="mockups/overlay-suggestions.png" alt="Suggestion overlay" /></td>
-    <td><img src="mockups/settings-setup.png" alt="Settings — Setup tab" /></td>
+    <td><img src="mockups/settings-setup.png" alt="Settings - Setup tab" /></td>
   </tr>
   <tr>
     <td align="center"><em>Overlay anchored above Claude's chat input</em></td>
@@ -64,7 +64,7 @@ Run the installer (per-user, no admin needed). On first launch, a 4-step wizard 
 1. Welcome
 2. Pick a provider
 3. Paste your API key
-4. Done — try `Ctrl + Shift + Space` in Claude
+4. Done - try `Ctrl + Shift + Space` in Claude
 
 ## Pick any AI provider
 
@@ -81,12 +81,12 @@ For most users: pick **Gemini Flash**. A heavy day of suggestions costs less tha
 
 ## Why it feels different from other prompt tools
 
-- **Context-aware** — anything you've already typed in Claude's chat box biases the suggestions toward that direction.
-- **Variation seed** — re-summon with unchanged context and the suggestions explicitly avoid repeating prior ideas. No echo chamber.
-- **Rate-limited by default** — per-action cooldowns + a 60-call-per-minute hard cap so a stuck hotkey can't cost you $400.
-- **Drops out of the way** — overlay anchors above Claude's chat input via Windows UI Automation, dismisses on Esc, never steals focus permanently.
-- **Accessible** — WCAG AA contrast, full keyboard nav, ARIA listbox semantics, `prefers-reduced-motion` honored.
-- **Tiny** — ~2.3 MB NSIS installer, ~80 MB idle memory.
+- **Context-aware** - anything you've already typed in Claude's chat box biases the suggestions toward that direction.
+- **Variation seed** - re-summon with unchanged context and the suggestions explicitly avoid repeating prior ideas. No echo chamber.
+- **Rate-limited by default** - per-action cooldowns + a 60-call-per-minute hard cap so a stuck hotkey can't cost you $400.
+- **Drops out of the way** - overlay anchors above Claude's chat input via Windows UI Automation, dismisses on Esc, never steals focus permanently.
+- **Accessible** - WCAG AA contrast, full keyboard nav, ARIA listbox semantics, `prefers-reduced-motion` honored.
+- **Tiny** - ~2.3 MB NSIS installer, ~80 MB idle memory.
 
 ## Configure (Settings tab walkthrough)
 
@@ -96,8 +96,8 @@ For most users: pick **Gemini Flash**. A heavy day of suggestions costs less tha
     <td width="50%"><img src="mockups/settings-privacy.png" alt="Privacy tab" /></td>
   </tr>
   <tr>
-    <td><strong>Behavior</strong> — suggestions per round (3–6), style preset (Default / Concise / Exploratory / Technical), auto-send after paste, start on Windows boot.</td>
-    <td><strong>Privacy</strong> — telemetry opt-in (anonymous counts only, no prompt content), open-source notice, full reset.</td>
+    <td><strong>Behavior</strong> - suggestions per round (3–6), style preset (Default / Concise / Exploratory / Technical), auto-send after paste, start on Windows boot.</td>
+    <td><strong>Privacy</strong> - telemetry opt-in (anonymous counts only, no prompt content), open-source notice, full reset.</td>
   </tr>
 </table>
 
@@ -127,22 +127,22 @@ Five units, one job each:
 | [`src-tauri/src/reader.rs`](src-tauri/src/reader.rs) | Walks Claude Desktop's UI Automation tree, returns a `ChatSnapshot` |
 | [`src-tauri/src/suggester.rs`](src-tauri/src/suggester.rs) | Normalizes 4 different API shapes (Anthropic, OpenAI, OpenRouter, Gemini) |
 | [`src-tauri/src/injector.rs`](src-tauri/src/injector.rs) | Pastes into Claude's chat box via UIA `SetValue` with clipboard fallback |
-| [`ui/`](ui/) | Static HTML/CSS/JS. No build step — just files. |
+| [`ui/`](ui/) | Static HTML/CSS/JS. No build step - just files. |
 
 Full design doc: [`docs/superpowers/specs/2026-05-24-ai-ai-design.md`](docs/superpowers/specs/2026-05-24-ai-ai-design.md)
 
 ## Roadmap
 
-- [x] Windows v0.1.0 — 4 providers, full state coverage, rate limiting, autostart, MIT
+- [x] Windows v0.1.0 - 4 providers, full state coverage, rate limiting, autostart, MIT
 - [ ] First signed installer release (v0.1.0)
-- [ ] Per-conversation memory — remember which angles you've already explored
+- [ ] Per-conversation memory - remember which angles you've already explored
 - [ ] macOS port (UIA → AXUIElement on macOS, same Suggester / Overlay)
 - [ ] Web-Claude support via a Chrome extension companion
-- [ ] **AI-AI Pro** *(separate paid product)* — hosted updates, premium presets, team workspace, priority support
+- [ ] **AI-AI Pro** *(separate paid product)* - hosted updates, premium presets, team workspace, priority support
 
 ## Contributing
 
-PRs welcome. The codebase is small and the units are isolated — a focused fix or feature usually touches one file. Check [`TESTING.md`](TESTING.md) for the dev loop, then open an issue describing what you want to change before sending the PR.
+PRs welcome. The codebase is small and the units are isolated - a focused fix or feature usually touches one file. Check [`TESTING.md`](TESTING.md) for the dev loop, then open an issue describing what you want to change before sending the PR.
 
 ## Privacy
 
@@ -156,7 +156,7 @@ Independent project, not affiliated with Anthropic, OpenAI, OpenRouter, or Googl
 
 ## License
 
-[MIT](LICENSE) — use it, fork it, ship it.
+[MIT](LICENSE) - use it, fork it, ship it.
 
 <p align="center">
   <sub>Built with care by <a href="https://github.com/RemielDev">@RemielDev</a></sub>

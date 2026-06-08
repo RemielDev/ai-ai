@@ -164,6 +164,6 @@ pub struct TrialStatus {
 }
 
 pub fn trial_status(_app: &AppHandle) -> TrialStatus {
-    // Open-source build is free forever — there is no trial.
+    // Open-source build is free forever - there is no trial.
     TrialStatus { in_trial: false, days_left: 0 }
 }

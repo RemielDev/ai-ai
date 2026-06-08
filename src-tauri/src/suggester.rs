@@ -1,4 +1,4 @@
-//! Suggester — multi-provider AI client.
+//! Suggester - multi-provider AI client.
 //!
 //! Providers: Anthropic, OpenAI, OpenRouter, Google Gemini.
 //! Each provider has its own endpoint shape; we normalize all of them
@@ -71,7 +71,7 @@ Bias your suggestions toward extending, refining, or sharpening that direction."
         let variation_block = if seed > 0 && !prior.is_empty() {
             let listed: Vec<String> = prior.iter().map(|s| format!("- {}", s.text)).collect();
             format!(
-                "\n\nYou have already suggested these before — generate {} that explore DIFFERENT angles and phrasings. Avoid restating these:\n{}",
+                "\n\nYou have already suggested these before - generate {} that explore DIFFERENT angles and phrasings. Avoid restating these:\n{}",
                 n,
                 listed.join("\n")
             )

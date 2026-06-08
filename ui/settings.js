@@ -1,15 +1,15 @@
-// Settings frontend — multi-provider, tabbed, with hotkey capture and live validation.
+// Settings frontend - multi-provider, tabbed, with hotkey capture and live validation.
 
 const { invoke } = window.__TAURI__.core;
 const opener = window.__TAURI__.opener;
 
 const els = {
-  // Setup — provider
+  // Setup - provider
   provider:      document.getElementById("provider-select"),
   providerCost:  document.getElementById("provider-cost"),
   model:         document.getElementById("model-input"),
   modelHint:     document.getElementById("model-hint"),
-  // Setup — key
+  // Setup - key
   keyCardTitle:  document.getElementById("key-card-title"),
   keyDesc:       document.getElementById("key-desc"),
   keyConsoleLink: document.getElementById("key-console-link"),
@@ -19,7 +19,7 @@ const els = {
   clearKey:      document.getElementById("clear-key"),
   keyStatus:     document.getElementById("key-status"),
   keyMissingBanner: document.getElementById("key-missing-banner"),
-  // Setup — hotkeys
+  // Setup - hotkeys
   summon:        document.getElementById("summon-hotkey"),
   action:        document.getElementById("action-hotkey"),
   summonKeys:    document.getElementById("summon-keys"),
@@ -40,7 +40,7 @@ const els = {
   aboutCount:    document.getElementById("about-count"),
   checkUpdates:  document.getElementById("check-updates"),
   updateStatus:  document.getElementById("update-status"),
-  // (Trial removed — this is the OSS build, always free.)
+  // (Trial removed - this is the OSS build, always free.)
   // Actions
   saveAll:       document.getElementById("save-all"),
   revert:        document.getElementById("revert"),

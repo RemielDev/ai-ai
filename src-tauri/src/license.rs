@@ -27,6 +27,6 @@ pub fn activate(_key: &str) -> LicenseStatus {
     LicenseStatus {
         valid: true,
         tier: "Free · MIT".into(),
-        message: "This is the open-source build — no license needed.".into(),
+        message: "This is the open-source build - no license needed.".into(),
     }
 }

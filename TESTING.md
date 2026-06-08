@@ -1,8 +1,8 @@
-# AI-AI — testing loop (PowerShell)
+# AI-AI - testing loop (PowerShell)
 
 The fastest iteration cycle. Copy-paste each block into PowerShell.
 
-## Fast loop — no installer (~2 min per cycle)
+## Fast loop - no installer (~2 min per cycle)
 
 ```powershell
 cd ~/Development/ai-ai
@@ -24,7 +24,7 @@ Remove-Item -Recurse -Force "$env:APPDATA\com.aiai.desktop" -ErrorAction Silentl
 Remove-Item -Recurse -Force "$env:APPDATA\ai-ai" -ErrorAction SilentlyContinue
 ```
 
-Then relaunch — onboarding wizard fires again.
+Then relaunch - onboarding wizard fires again.
 
 ## Full installer loop (~3 min)
 
@@ -39,16 +39,16 @@ cargo tauri build
 
 ## What to test (10-step checklist)
 
-1. **First-run wizard** — appears on launch? Skip key → reaches step 3 → "Done" closes the window?
-2. **Tray** — left-click opens Settings, right-click shows menu (Summon now / Settings / About / Quit)?
-3. **API key** — Settings → Setup tab → paste key → "Save & verify" → green check?
-4. **Hotkey recorder** — Setup tab → click a recorder → press `Ctrl+Shift+J` → captured as kbd chips?
-5. **Tabs** — Behavior / Privacy / About all render? Switches and slider work?
-6. **Summon** — open Claude Desktop, click into chat after a response, press `Ctrl+Shift+Space` → overlay appears above chat input?
-7. **Nav** — arrow keys move highlight? `1`–`6` jump? `Esc` dismisses?
-8. **Paste** — highlight → `Ctrl+Shift+Enter` → text appears in Claude's chat box (NOT sent unless auto-send is on)?
-9. **Improve** — type a draft in Claude's chat → `Ctrl+Shift+Enter` → draft is rewritten in place?
-10. **Re-summon** — `Ctrl+Shift+Space` again with same Claude response → suggestions differ from last batch?
+1. **First-run wizard** - appears on launch? Skip key → reaches step 3 → "Done" closes the window?
+2. **Tray** - left-click opens Settings, right-click shows menu (Summon now / Settings / About / Quit)?
+3. **API key** - Settings → Setup tab → paste key → "Save & verify" → green check?
+4. **Hotkey recorder** - Setup tab → click a recorder → press `Ctrl+Shift+J` → captured as kbd chips?
+5. **Tabs** - Behavior / Privacy / About all render? Switches and slider work?
+6. **Summon** - open Claude Desktop, click into chat after a response, press `Ctrl+Shift+Space` → overlay appears above chat input?
+7. **Nav** - arrow keys move highlight? `1`–`6` jump? `Esc` dismisses?
+8. **Paste** - highlight → `Ctrl+Shift+Enter` → text appears in Claude's chat box (NOT sent unless auto-send is on)?
+9. **Improve** - type a draft in Claude's chat → `Ctrl+Shift+Enter` → draft is rewritten in place?
+10. **Re-summon** - `Ctrl+Shift+Space` again with same Claude response → suggestions differ from last batch?
 
 ## Log location
 

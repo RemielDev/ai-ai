@@ -1,4 +1,4 @@
-//! HotkeyDaemon — registers global shortcuts, dispatches by focused window.
+//! HotkeyDaemon - registers global shortcuts, dispatches by focused window.
 
 use anyhow::{Context, Result};
 use serde::Serialize;
@@ -63,7 +63,7 @@ pub async fn dispatch(app: AppHandle, shortcut: Shortcut) -> Result<()> {
     }
 }
 
-/// Called from the tray menu — same as summon but skips Claude-focus check
+/// Called from the tray menu - same as summon but skips Claude-focus check
 /// (user explicitly asked, so show overlay anyway with an empty state).
 pub async fn manual_summon(app: AppHandle) -> Result<()> {
     let settings = settings::current(&app);
@@ -83,13 +83,13 @@ async fn on_summon(app: AppHandle, settings: Settings) -> Result<()> {
     match app.state::<Arc<AppState>>().rate_limit.check(RateAction::Summon) {
         RateVerdict::Allowed => {}
         RateVerdict::Cooldown { wait_ms } => {
-            debug!(wait_ms, "summon cooldown — ignored");
+            debug!(wait_ms, "summon cooldown - ignored");
             return Ok(());
         }
         RateVerdict::WindowExceeded { resets_in_ms } => {
             notify(
                 &app,
-                "AI-AI — slow down",
+                "AI-AI - slow down",
                 &format!(
                     "60 calls / minute reached. Try again in {}s.",
                     (resets_in_ms / 1000).max(1)
@@ -115,7 +115,7 @@ async fn on_summon(app: AppHandle, settings: Settings) -> Result<()> {
         notify(
             &app,
             "AI-AI",
-            "No recent Claude response found — wait for one to finish.",
+            "No recent Claude response found - wait for one to finish.",
         );
         return Ok(());
     }
@@ -123,7 +123,7 @@ async fn on_summon(app: AppHandle, settings: Settings) -> Result<()> {
     let Some(api_key) = secrets::get_api_key(settings.provider).ok().flatten() else {
         notify(
             &app,
-            "AI-AI — set up your API key",
+            "AI-AI - set up your API key",
             &format!("Open Settings to paste your {} API key.", settings.provider.label()),
         );
         let _ = crate::open_settings(&app);
@@ -172,7 +172,7 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
         RateVerdict::WindowExceeded { resets_in_ms } => {
             notify(
                 &app,
-                "AI-AI — slow down",
+                "AI-AI - slow down",
                 &format!("Rate cap hit. Try again in {}s.", (resets_in_ms / 1000).max(1)),
             );
             return Ok(());
@@ -182,7 +182,7 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
     let Some(api_key) = secrets::get_api_key(settings.provider).ok().flatten() else {
         notify(
             &app,
-            "AI-AI — set up your API key",
+            "AI-AI - set up your API key",
             &format!("Open Settings to paste your {} API key.", settings.provider.label()),
         );
         return Ok(());
@@ -200,7 +200,7 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
                     warn!(?e, "paste of improved prompt failed");
                     notify(
                         &app,
-                        "AI-AI — paste failed",
+                        "AI-AI - paste failed",
                         "Try clicking into Claude's chat box, then retry.",
                     );
                 }
@@ -208,7 +208,7 @@ async fn on_action(app: AppHandle, settings: Settings) -> Result<()> {
             Err(e) => {
                 warn!(?e, "improve_prompt failed");
                 let msg = friendly_error(&e.to_string());
-                notify(&app, "AI-AI — couldn't improve", &msg);
+                notify(&app, "AI-AI - couldn't improve", &msg);
             }
         }
     });
@@ -303,7 +303,7 @@ pub fn regenerate(app: AppHandle) -> Result<()> {
     let settings = settings::current(&app);
     match app.state::<Arc<AppState>>().rate_limit.check(RateAction::Regenerate) {
         RateVerdict::Allowed => {}
-        RateVerdict::Cooldown { .. } => anyhow::bail!("Slow down — wait a moment before regenerating."),
+        RateVerdict::Cooldown { .. } => anyhow::bail!("Slow down - wait a moment before regenerating."),
         RateVerdict::WindowExceeded { .. } => anyhow::bail!("Rate cap reached. Wait a minute and retry."),
     }
     let snapshot = app
@@ -370,7 +370,7 @@ fn categorize_error(raw: &str) -> SuggestionError {
     } else if lower.contains("zero usable suggestions") || lower.contains("decode suggestions") {
         SuggestionError {
             title: "Couldn't parse response".into(),
-            body: "Anthropic returned an unexpected shape. Try again — usually it works second time.".into(),
+            body: "Anthropic returned an unexpected shape. Try again - usually it works second time.".into(),
         }
     } else {
         SuggestionError {
